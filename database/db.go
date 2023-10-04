@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	_ "github.com/lib/pq"
 )
@@ -26,27 +25,11 @@ func ConnectDB() (*sql.DB, error) {
 	if err := createTables(db); err != nil {
 		log.Println(err)
 	}
+	c, err := loadRoles(db)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(c)
+
 	return db, nil
-}
-
-func createTables(d *sql.DB) error {
-	file, err := os.ReadFile("./database/tables.sql")
-	if err != nil {
-		log.Println(":Error: Couldn't load sql file:", err.Error())
-	}
-
-	tx, err := d.Begin()
-	if err != nil {
-		return err
-	}
-
-	requests := strings.Split(string(file), ";")
-	for _, request := range requests {
-		if _, err := tx.Exec(request); err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-	tx.Commit()
-	return nil
 }
