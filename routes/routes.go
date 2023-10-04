@@ -16,7 +16,6 @@ func NewRouter() *Router {
 		Router: mux.NewRouter(),
 	}
 
-	// r.db = models.Connect()
 	r.routes()
 	return r
 }
