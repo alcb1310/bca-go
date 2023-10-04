@@ -1,19 +1,30 @@
 package routes
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/alcb1310/bca-go-w-test/database"
 	"github.com/gorilla/mux"
 )
 
 type Router struct {
 	*mux.Router
+
+	db *sql.DB
 }
 
 func NewRouter() *Router {
+	conn, err := database.ConnectDB()
+	if err != nil {
+		log.Panic(fmt.Sprintf("Unable to connect to the database, error: %s", err.Error()))
+	}
 	r := &Router{
 		Router: mux.NewRouter(),
+		db:     conn,
 	}
 
 	r.routes()
