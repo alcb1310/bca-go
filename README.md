@@ -22,10 +22,10 @@ In order to achieve the project's description, the application will have both pu
 
 ### Public Endpoints
 
-***/login***\n
+***/login***<br />
 This endpoint will allow you to access all the protected routes, as a user you will have to provide your credentials (email and password) and if authorized you will be able to read the protected routes.
 
 ### Protected Endpoints
 
-***/api/v1/logout***\n
+***/api/v1/logout***<br />
 This endpoint will logout from the application and restrict access to all the protected routes
