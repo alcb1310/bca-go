@@ -2,7 +2,7 @@
 
 ## Tech Stack
 
-- Go (http://go.dev/)[http://go.dev]
+- Go [http://go.dev/](http://go.dev)
 - PostgreSQL (https://www.postgresql.org/)[https://www.postgresql.org/]
 
 ## Description
