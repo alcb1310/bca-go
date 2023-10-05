@@ -25,11 +25,10 @@ func ConnectDB() (*sql.DB, error) {
 	if err := createTables(db); err != nil {
 		log.Println(err)
 	}
-	c, err := loadRoles(db)
-	if err != nil {
+
+	if _, err := loadRoles(db); err != nil {
 		log.Println(err)
 	}
-	log.Println(c)
 
 	return db, nil
 }

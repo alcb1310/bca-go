@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -39,7 +38,6 @@ func loadRoles(d *sql.DB) (int, error) {
 		return 0, err
 	}
 
-	fmt.Println(c)
 	if c == 0 {
 		tx, err := d.Begin()
 		sql = "insert into role (id, name) values ('a', 'admin'), ('u', 'user')"
