@@ -6,7 +6,10 @@ create table if not exists company (
      name text not null,
      employees smallint  default 1,
      is_active boolean  default true,
-     created_at timestamp with time zone  default now()
+     created_at timestamp with time zone  default now(),
+
+     unique (ruc),
+     unique (name)
 );
 
 create table if not exists role (
