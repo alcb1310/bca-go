@@ -33,6 +33,7 @@ func NewRouter() *Router {
 
 func (s *Router) routes() {
 	s.HandleFunc("/", s.mainRoute)
+	s.HandleFunc("/register", s.registerRoute)
 }
 
 func (s *Router) mainRoute(w http.ResponseWriter, r *http.Request) {

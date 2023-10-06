@@ -1,0 +1,12 @@
+GET 0.0.0.0:42069
+
+POST 0.0.0.0:42069/register
+
+{
+     "id": "123456789",
+     "name": "Test Company",
+     "employees": 3,
+     "user_name": "Test User",
+     "user_email": "test@test.com",
+     "user_password": "password123"
+}
