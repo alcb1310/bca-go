@@ -70,8 +70,14 @@ func (s *Router) registerRoute(w http.ResponseWriter, r *http.Request) {
 			Employees: employees,
 			IsActive:  is_active,
 		}
+
+		pass, err := utils.EncryptPasssword(c.UserPassword)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		sql = "INSERT INTO \"user\" (email, name, password, company_id, role_id) VALUES ($1, $2, $3, $4, 'a')"
-		if _, err := tx.ExecContext(ctx, sql, c.UserEmail, c.UserName, c.UserPassword, co.ID); err != nil {
+		if _, err := tx.ExecContext(ctx, sql, c.UserEmail, c.UserName, pass, co.ID); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
