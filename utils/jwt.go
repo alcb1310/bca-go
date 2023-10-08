@@ -30,7 +30,7 @@ type JWTMaker struct {
 }
 
 type Maker interface {
-	CreateToken(userInfo types.User, role string, duration time.Duration) (string, error)
+	CreateToken(userInfo types.User, duration time.Duration) (string, error)
 	VerifyToken(token string) (*Payload, error)
 }
 
@@ -41,12 +41,12 @@ func NewJWTMaker(secretKey string) (Maker, error) {
 	return &JWTMaker{secretKey}, nil
 }
 
-func NewPayload(u types.User, role string, duration time.Duration) *Payload {
+func NewPayload(u types.User, duration time.Duration) *Payload {
 	payload := &Payload{
 		ID:         u.Id,
 		Email:      u.Email,
 		CompanyId:  u.CompanyId,
-		Role:       role,
+		Role:       u.RoleId,
 		IsLoggedIn: true,
 		IssuedAt:   time.Now(),
 		ExpiredAt:  time.Now().Add(duration),
@@ -54,8 +54,8 @@ func NewPayload(u types.User, role string, duration time.Duration) *Payload {
 	return payload
 }
 
-func (maker *JWTMaker) CreateToken(userInfo types.User, role string, duration time.Duration) (string, error) {
-	payload := NewPayload(userInfo, role, duration)
+func (maker *JWTMaker) CreateToken(userInfo types.User, duration time.Duration) (string, error) {
+	payload := NewPayload(userInfo, duration)
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
 	return jwtToken.SignedString([]byte(maker.secretKey))
