@@ -3,7 +3,10 @@ package routes
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
@@ -139,8 +142,26 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 			CompanyId: cId,
 			RoleId:    role_id,
 		}
+		secretKey := os.Getenv("SECRET")
+		jwtMaker, err := utils.NewJWTMaker(secretKey)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		token, err := jwtMaker.CreateToken(u, 60*time.Minute)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		sql = "INSERT INTO logged_in_user (user_id, token) VALUES ($1, $2)"
+		if _, err := s.db.Exec(sql, u.Id, []byte(token)); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-		json.NewEncoder(w).Encode(u)
+		json.NewEncoder(w).Encode(map[string]string{
+			"token": fmt.Sprintf("Bearer %s", token),
+		})
 		return
 	}
 	w.WriteHeader(http.StatusMethodNotAllowed)
