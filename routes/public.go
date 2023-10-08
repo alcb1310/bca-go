@@ -122,8 +122,16 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		uId, _ := uuid.Parse(id)
-		cId, _ := uuid.Parse(company_id)
+		uId, err := uuid.Parse(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		cId, err := uuid.Parse(company_id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		u := types.User{
 			Id:        uId,
 			Email:     email,
