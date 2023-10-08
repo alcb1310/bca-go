@@ -91,3 +91,49 @@ func (s *Router) registerRoute(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusMethodNotAllowed)
 }
+
+func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		var lc types.LoginCredentials
+		json.NewDecoder(r.Body).Decode(&lc)
+
+		if lc.Email != "" && !utils.IsValidEmail(lc.Email) {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{
+				"Message": "Invalid information",
+			})
+			return
+		}
+
+		if lc.Email == "" || lc.Password == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		var id, email, name, password, company_id, role_id string
+		sql := "SELECT id, email, name, password, company_id, role_id from \"user\" where email = $1"
+		if err := s.db.QueryRow(sql, lc.Email).Scan(&id, &email, &name, &password, &company_id, &role_id); err != nil {
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			return
+		}
+		isValid, _ := utils.ComparePassword(password, lc.Password)
+		if !isValid {
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			return
+		}
+
+		uId, _ := uuid.Parse(id)
+		cId, _ := uuid.Parse(company_id)
+		u := types.User{
+			Id:        uId,
+			Email:     email,
+			Name:      name,
+			CompanyId: cId,
+			RoleId:    role_id,
+		}
+
+		json.NewEncoder(w).Encode(u)
+		return
+	}
+	w.WriteHeader(http.StatusMethodNotAllowed)
+}
