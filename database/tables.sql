@@ -34,6 +34,13 @@ create table if not exists "user" (
      unique (email)
 );
 
+create table if not exists logged_in_user (
+     user_id uuid not null,
+     token bytea not null,
+
+     unique (user_id)
+);
+
 --  REQUIRED VIEWS
 
 create or replace view user_without_password as
