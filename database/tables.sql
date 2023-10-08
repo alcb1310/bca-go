@@ -6,11 +6,14 @@ create table if not exists company (
      name text not null,
      employees smallint  default 1,
      is_active boolean  default true,
-     created_at timestamp with time zone  default now(),
-
-     unique (ruc),
-     unique (name)
+     created_at timestamp with time zone  default now()
 );
+
+alter table company drop constraint if exists company_name_key;
+alter table company drop constraint if exists company_ruc_key;
+
+alter table company add constraint company_name_key unique (name);
+alter table company add constraint company_ruc_key unique (ruc);
 
 create table if not exists role (
      id char(2) PRIMARY KEY,
