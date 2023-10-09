@@ -35,6 +35,8 @@ func (s *Router) routes() {
 	s.HandleFunc("/", s.mainRoute)
 	s.HandleFunc("/register", s.registerRoute)
 	s.HandleFunc("/login", s.handleLogin)
+
+	s.protectedRoutes()
 }
 
 func (s *Router) mainRoute(w http.ResponseWriter, r *http.Request) {
