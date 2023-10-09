@@ -153,7 +153,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-		sql = "INSERT INTO logged_in_user (user_id, token) VALUES ($1, $2)"
+		sql = "INSERT INTO logged_in_user (user_id, token) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET token = $2"
 		if _, err := s.db.Exec(sql, u.Id, []byte(token)); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
