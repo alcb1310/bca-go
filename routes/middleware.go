@@ -16,23 +16,16 @@ import (
 
 func (s *Router) jsonResponse(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
+		// w.Header().Add("Content-Type", "application/json")
 		next.ServeHTTP(w, r)
 	})
 }
 
 func (s *ProtectedRouter) authVerify(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bearerToken := r.Header.Get("Authorization")
-		if bearerToken == "" {
-			w.WriteHeader(http.StatusForbidden)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Missing autherization token",
-			})
-			return
-		}
+		cookie, _ := r.Cookie("bca")
 
-		token := strings.Split(bearerToken, " ")
+		token := strings.Split(cookie.String(), "=")
 		if len(token) != 2 {
 			w.WriteHeader(http.StatusForbidden)
 			json.NewEncoder(w).Encode(map[string]string{
