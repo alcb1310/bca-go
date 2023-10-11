@@ -229,10 +229,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 			Secure:   true,
 		}
 		http.SetCookie(w, cookie)
-		json.NewEncoder(w).Encode(map[string]string{
-			"status": "logged in",
-			// "token": fmt.Sprintf("Bearer %s", token),
-		})
+		http.Redirect(w, r, "/api/v1/", http.StatusSeeOther)
 		return
 	}
 	w.WriteHeader(http.StatusMethodNotAllowed)

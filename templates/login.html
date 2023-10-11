@@ -30,9 +30,10 @@
 <script>
      document.body.addEventListener('htmx:beforeSwap', function (evt) {
           if (evt.detail.xhr.status === 401) {
-               console.log("received a 401")
                evt.detail.shouldSwap = true
                evt.detail.isError = false
+          } else if (evt.detail.xhr.status === 200) {
+               window.location.replace("/api/v1/")
           }
      });
 </script>

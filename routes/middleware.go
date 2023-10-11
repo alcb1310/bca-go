@@ -27,29 +27,20 @@ func (s *ProtectedRouter) authVerify(next http.Handler) http.Handler {
 
 		token := strings.Split(cookie.String(), "=")
 		if len(token) != 2 {
-			w.WriteHeader(http.StatusForbidden)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Invalid autherization token",
-			})
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 
 		secretKey := os.Getenv("SECRET")
 		maker, err := utils.NewJWTMaker(secretKey)
 		if err != nil {
-			w.WriteHeader(http.StatusForbidden)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Unable to authenticate",
-			})
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 
 		tokenData, err := maker.VerifyToken(token[1])
 		if err != nil {
-			w.WriteHeader(http.StatusForbidden)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Unable to authenticate",
-			})
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 
@@ -61,18 +52,12 @@ func (s *ProtectedRouter) authVerify(next http.Handler) http.Handler {
 		var t string
 		sql := "SELECT token FROM logged_in_user WHERE user_id = $1"
 		if err := s.db.QueryRow(sql, tokenData.ID).Scan(&t); err != nil {
-			w.WriteHeader(http.StatusForbidden)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Unable to authenticate",
-			})
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 
 		if !bytes.Equal([]byte(token[1]), []byte(t)) {
-			w.WriteHeader(http.StatusForbidden)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Unable to authenticate",
-			})
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 
