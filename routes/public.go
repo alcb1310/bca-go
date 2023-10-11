@@ -229,7 +229,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 			Secure:   true,
 		}
 		http.SetCookie(w, cookie)
-		http.Redirect(w, r, "/api/v1/", http.StatusSeeOther)
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 	w.WriteHeader(http.StatusMethodNotAllowed)
