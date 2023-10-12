@@ -4,6 +4,7 @@
 
 - Go [http://go.dev/](http://go.dev)
 - PostgreSQL [https://www.postgresql.org/](https://www.postgresql.org/)
+- HTMX [https://htmx.org/](https://htmx.org/)
 
 ## Description
 
@@ -27,5 +28,7 @@ This endpoint will allow you to access all the protected routes, as a user you w
 
 ### Protected Endpoints
 
-***/api/v1/logout***<br />
-This endpoint will logout from the application and restrict access to all the protected routes
+***/api/v1/***<br />
+This endpoint will show the logged in application home page, with a collapsable menu in the left side of the screen.  All interactions should be displayed on the content part of the HTML
+for navigating and interacting with the application, we will be using HTMX
+
