@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"text/template"
@@ -137,6 +138,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		if err := s.db.QueryRow(sql, lc.Email).Scan(&id, &email, &name, &password, &company_id, &role_id); err != nil {
 			// http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 			// tmplString := "<div id=\"#result\"> {{.Error}} </div>"
+			fmt.Println(err.Error())
 			tmplString := "{{.Error}}"
 			tmpl := template.Must(template.New("result").Parse(tmplString))
 			data := map[string]string{
@@ -154,6 +156,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		isValid, _ := utils.ComparePassword(password, lc.Password)
 		if !isValid {
 			// http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			fmt.Println("Incorrect password")
 			tmplString := "{{.Error}}"
 			tmpl := template.Must(template.New("result").Parse(tmplString))
 			data := map[string]string{
@@ -171,6 +174,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		uId, err := uuid.Parse(id)
 		if err != nil {
 			// http.Error(w, err.Error(), http.StatusInternalServerError)
+			fmt.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]string{
 				"error": "Internal server error",
@@ -197,6 +201,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		jwtMaker, err := utils.NewJWTMaker(secretKey)
 		if err != nil {
 			// http.Error(w, err.Error(), http.StatusUnauthorized)
+			fmt.Println(err.Error())
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(map[string]string{
 				"error": "Invalid credentails",
@@ -206,6 +211,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		token, err := jwtMaker.CreateToken(u, 60*time.Minute)
 		if err != nil {
 			// http.Error(w, err.Error(), http.StatusUnauthorized)
+			fmt.Println(err.Error())
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(map[string]string{
 				"error": "Invalid credentails",
@@ -215,6 +221,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		sql = "INSERT INTO logged_in_user (user_id, token) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET token = $2"
 		if _, err := s.db.Exec(sql, u.Id, []byte(token)); err != nil {
 			// http.Error(w, err.Error(), http.StatusInternalServerError)
+			fmt.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(map[string]string{
 				"error": "Internal Server Error",
