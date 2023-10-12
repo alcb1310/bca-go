@@ -22,5 +22,7 @@ func main() {
 
 	h := routes.NewRouter()
 
+	fileServer := http.FileServer(http.Dir("./dist/"))
+	h.PathPrefix("/css/").Handler(http.StripPrefix("/css/", fileServer))
 	log.Panic(http.ListenAndServe(fmt.Sprintf(":%s", port), h))
 }

@@ -9,6 +9,12 @@ create table if not exists company (
      created_at timestamp with time zone  default now()
 );
 
+alter table company drop constraint if exists company_name_key;
+alter table company drop constraint if exists company_ruc_key;
+
+alter table company add constraint company_name_key unique (name);
+alter table company add constraint company_ruc_key unique (ruc);
+
 create table if not exists role (
      id char(2) PRIMARY KEY,
      name varchar(255) not null,
@@ -26,6 +32,13 @@ create table if not exists "user" (
      role_id char(2) references role(id) on delete restrict,
 
      unique (email)
+);
+
+create table if not exists logged_in_user (
+     user_id uuid not null,
+     token bytea not null,
+
+     unique (user_id)
 );
 
 --  REQUIRED VIEWS

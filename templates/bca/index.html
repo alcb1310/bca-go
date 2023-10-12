@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>SCP</title>
+     <link href="/css/output.css" rel="stylesheet">
+     <script src="/css/htmx.min.js"></script>
+</head>
+
+<body>
+     <div class="grid grid-cols-12">
+          <nav id="menu"
+               class="col-span-2 border  border-t-0 border-b-0 border-s-0  border-e-slate-800 h-screen scroll-auto">
+               <h1 class="py-2 px-3 text-2xl font-bold uppercase text-blue-700 t-gray-50 text-center">BCA</h1>
+               <details class="px-3 pt-3">
+                    <summary class="text-slate-600">Transacciones</summary>
+                    <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Presupuesto</p>
+                    <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Facturas</p>
+                    <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Cierre mensual</p>
+               </details>
+               <details class="px-3">
+                    <summary class="text-slate-600">Reportes</summary>
+                    <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Actual</p>
+                    <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Hist&oacute;rico</p>
+               </details>
+               <details class="px-3">
+                    <summary class="text-slate-600">Par&aacute;metros</summary>
+                    <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Proveedores</p>
+                    <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Partidas</p>
+                    <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Proyectos</p>
+               </details>
+               <details class="px-3">
+                    <summary class="text-slate-600">Usuarios</summary>
+                    <p class="px-5 text-slate-600 text-sm hover:cursor-pointer" hx-get="/api/v1/edit-user"
+                         hx-target="#content" hx-swap="innerHTML">
+                         Editar usuario
+                    </p>
+                    <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer" hx-get="/api/v1/change-password"
+                         hx-target="#content" hx-swap="innerHTML">
+                         Cambiar contrase&ntilde;a
+                    </p>
+               </details>
+          </nav>
+
+          <div class="col-span-10">
+               <div id="title" class="w-full py-2 px-3 flex justify-between bg-blue-700 text-gray-50 items-center">
+                    <h2 class="mx-3 text-2xl font-bold uppercase">Sistema Control Presupuestario</h2>
+                    <a href="/api/v1/logout" class="mx-3 hover:text-gray-300 text-xs uppercase">salir</a>
+               </div>
+
+               <section id="content" class="col-span-10 m-3 text-slate-700">
+                    <p>Content</p>
+               </section>
+          </div>
+     </div>
+</body>
+
+</html>
