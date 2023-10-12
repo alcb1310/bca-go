@@ -5,10 +5,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gorilla/mux"
 )
 
 func TestMainRoute(t *testing.T) {
-	s := NewRouter()
+	s := &Router{
+		Router: mux.NewRouter(),
+	}
 	t.Run("should return 200 on GET request", func(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodGet, "/", nil)
 		res := httptest.NewRecorder()
