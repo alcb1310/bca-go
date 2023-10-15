@@ -1,3 +1,16 @@
-<div>
-     <h3>Editar usuario</h3>
+<div hx-trigger="load" hx-target="#all" hx-get="/api/v1/users">
+     <div class="flex w-full items-center justify-between">
+          <h3 class="text-lg font-semibold">Usuarios</h3>
+          <input type="text" placeholder="Buscar usuario"
+               class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+          <div>
+               <button
+                    class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-blue-400"
+                    hx-target="#all" hx-get="/api/v1/users">Buscar</button>
+               <button
+                    class="mt-2 bg-green-700 text-gray-50 fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-green-400"
+                    hx-target="#all" hx-get="/api/v1/users">Agregar</button>
+          </div>
+     </div>
+     <div id="all"></div>
 </div>
