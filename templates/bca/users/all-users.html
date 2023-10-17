@@ -9,9 +9,11 @@
           </thead>
           <tbody>
                {{range . }}
-               <td>{{.Email}}</td>
-               <td>{{.Name}}</td>
-               <td>{{.RoleId}}</td>
+               <tr>
+                    <td>{{.Email}}</td>
+                    <td>{{.Name}}</td>
+                    <td>{{.RoleId}}</td>
+               </tr>
                {{ end }}
           </tbody>
      </table>

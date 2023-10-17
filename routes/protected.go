@@ -24,10 +24,11 @@ func (s *Router) protectedRoutes() {
 
 	p.HandleFunc("/logout", p.handleLogout).Methods(http.MethodGet)
 	p.HandleFunc("/change-password", p.handleChangePassword).Methods(http.MethodGet)
-	p.HandleFunc("/edit-user", p.handleEditUser).Methods(http.MethodGet)
+	p.HandleFunc("/edit-user", p.handleEditUser)
 	p.HandleFunc("/", p.handleBCAHome).Methods(http.MethodGet)
 
 	p.HandleFunc("/users", p.handleUsers)
+	p.HandleFunc("/users/add", p.tmplAddUser)
 }
 
 func (s *ProtectedRouter) handleChangePassword(w http.ResponseWriter, r *http.Request) {
