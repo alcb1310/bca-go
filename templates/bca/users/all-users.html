@@ -18,15 +18,15 @@
                          <img
                               src="/css/images/edit-outline.svg" alt="delete button"
                               width="15px"
-                              hx-update="/users/{{.Id}}"
-                              hx-target="all"
+                              hx-get="/api/v1/users/{{.Id}}"
+                              hx-target="#all"
                               class="mx-3"
                          />
                          <img
                               src="/css/images/trash-outline.svg" alt="delete button"
                               width="15px"
-                              hx-delete="/users/{{.Id}}"
-                              hx-target="all"
+                              hx-delete="/api/v1/users/{{.Id}}"
+                              hx-target="#all"
                               hx-confirm="Est&aacute; seguro de querer eliminar usuario con email: {{.Email}}"
                          />
                     </td>
@@ -35,3 +35,11 @@
           </tbody>
      </table>
 </div>
+
+<script>
+     document.body.addEventListener('htmx:beforeSwap', function (evt) {
+          if (evt.detail.xhr.status === 400) {
+               alert("No se puede eliminar al usuario activo")
+          }
+     });
+</script>

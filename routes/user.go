@@ -7,6 +7,7 @@ import (
 	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 )
 
 type UserInfo struct {
@@ -109,6 +110,35 @@ func (s *ProtectedRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
+}
+
+func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userId, err := uuid.Parse(vars["userId"])
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+	ctxPayload, _ := getMyPaload(r)
+
+	switch r.Method {
+	case http.MethodDelete:
+		if ctxPayload.Id == userId {
+			http.Error(w, "Can't delete yourself", http.StatusBadRequest)
+			return
+		}
+
+		sql := "DELETE FROM \"user\" WHERE id = $1 and company_id = $2"
+		_ = sql
+		if _, err := s.db.Exec(sql, userId, ctxPayload.CompanyId); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, "/api/v1/edit-user", http.StatusPermanentRedirect)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+
 }
 
 func (s *ProtectedRouter) tmplAddUser(w http.ResponseWriter, r *http.Request) {
