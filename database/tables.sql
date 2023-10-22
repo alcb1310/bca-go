@@ -45,7 +45,7 @@ create table if not exists logged_in_user (
 
 create or replace view user_without_password as
 select c.id company_id, c.ruc ruc, c.name company_name, c.employees employees, u.id user_id,
-u.email user_email, u.name user_name, r.name role_name
+u.email user_email, u.name user_name, r.name role_name, r.id role_id
 from "user" u
 inner join role r on u.role_id = r.id
 inner join company c on u.company_id = c.id;

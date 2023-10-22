@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"strings"
 	"text/template"
 
 	"github.com/alcb1310/bca-go-w-test/types"
@@ -122,6 +123,42 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 	ctxPayload, _ := getMyPaload(r)
 
 	switch r.Method {
+	case http.MethodGet:
+		sql := "SELECT user_id, user_email, user_name, role_id FROM user_without_password where company_id = $2 and user_id = $1"
+		// sql := "SELECT user_id, user_email, user_name, role_name FROM user_without_password WHERE company_id=$1"
+		rows, err := s.db.Query(sql, userId, ctxPayload.CompanyId)
+		if err != nil {
+			http.Error(w, "Error al buscar usuarios", http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+		user := types.User{}
+
+		for rows.Next() {
+			var id, email, name, roleId string
+			if err := rows.Scan(&id, &email, &name, &roleId); err != nil {
+				http.Error(w, "Error al buscar usuarios", http.StatusInternalServerError)
+				return
+			}
+			foundUserId, err := uuid.Parse(id)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			user.Id = foundUserId
+			user.Name = name
+			user.Email = email
+			user.CompanyId = ctxPayload.CompanyId
+			user.RoleId = strings.Trim(roleId, " ")
+		}
+		tmpl, err := template.ParseFiles("templates/bca/users/add-user.html")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+
+		tmpl.Execute(w, user)
 	case http.MethodDelete:
 		if ctxPayload.Id == userId {
 			http.Error(w, "Can't delete yourself", http.StatusBadRequest)

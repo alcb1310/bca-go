@@ -28,8 +28,8 @@ func (s *Router) protectedRoutes() {
 	p.HandleFunc("/", p.handleBCAHome).Methods(http.MethodGet)
 
 	p.HandleFunc("/users", p.handleUsers)
-	p.HandleFunc("/users/{userId}", p.handleSimpleUser)
 	p.HandleFunc("/users/add", p.tmplAddUser)
+	p.HandleFunc("/users/{userId}", p.handleSimpleUser)
 }
 
 func (s *ProtectedRouter) handleChangePassword(w http.ResponseWriter, r *http.Request) {
