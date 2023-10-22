@@ -123,6 +123,40 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 	ctxPayload, _ := getMyPaload(r)
 
 	switch r.Method {
+	case http.MethodPut:
+		u := &UserInfo{}
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if r.FormValue("email") == "" {
+			u.email = nil
+		} else {
+			email := r.FormValue("email")
+			u.email = &email
+		}
+
+		if r.FormValue("name") == "" {
+			u.name = nil
+		} else {
+			name := r.FormValue("name")
+			u.name = &name
+		}
+
+		if r.FormValue("role") == "" {
+			u.role = nil
+		} else {
+			role := r.FormValue("role")
+			u.role = &role
+		}
+
+		sql := "UPDATE \"user\" SET email=$3, name=$4, role_id=$5 WHERE id=$1 AND company_id = $2"
+		if _, err := s.db.Exec(sql, userId, ctxPayload.CompanyId, u.email, u.name, u.role); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, "/api/v1/edit-user", http.StatusPermanentRedirect)
 	case http.MethodGet:
 		sql := "SELECT user_id, user_email, user_name, role_id FROM user_without_password where company_id = $2 and user_id = $1"
 		// sql := "SELECT user_id, user_email, user_name, role_name FROM user_without_password WHERE company_id=$1"
@@ -166,7 +200,6 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 		}
 
 		sql := "DELETE FROM \"user\" WHERE id = $1 and company_id = $2"
-		_ = sql
 		if _, err := s.db.Exec(sql, userId, ctxPayload.CompanyId); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
