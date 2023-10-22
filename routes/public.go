@@ -156,7 +156,6 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		isValid, _ := utils.ComparePassword(password, lc.Password)
 		if !isValid {
 			// http.Error(w, "Invalid credentials", http.StatusUnauthorized)
-			fmt.Println("Incorrect password")
 			tmplString := "{{.Error}}"
 			tmpl := template.Must(template.New("result").Parse(tmplString))
 			data := map[string]string{
