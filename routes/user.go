@@ -152,14 +152,13 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 
 		sql := "UPDATE \"user\" SET email=$3, name=$4, role_id=$5 WHERE id=$1 AND company_id = $2"
 		if _, err := s.db.Exec(sql, userId, ctxPayload.CompanyId, u.email, u.name, u.role); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusConflict)
 			return
 		}
 
 		http.Redirect(w, r, "/api/v1/edit-user", http.StatusPermanentRedirect)
 	case http.MethodGet:
 		sql := "SELECT user_id, user_email, user_name, role_id FROM user_without_password where company_id = $2 and user_id = $1"
-		// sql := "SELECT user_id, user_email, user_name, role_name FROM user_without_password WHERE company_id=$1"
 		rows, err := s.db.Query(sql, userId, ctxPayload.CompanyId)
 		if err != nil {
 			http.Error(w, "Error al buscar usuarios", http.StatusInternalServerError)
