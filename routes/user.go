@@ -54,7 +54,7 @@ func (s *ProtectedRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if r.FormValue("role") == "" {
-			u.password = nil
+			u.role = nil
 		} else {
 			role := r.FormValue("role")
 			u.role = &role
