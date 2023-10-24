@@ -23,26 +23,13 @@ func (s *Router) protectedRoutes() {
 	p.Use(p.authVerify)
 
 	p.HandleFunc("/logout", p.handleLogout).Methods(http.MethodGet)
-	p.HandleFunc("/change-password", p.handleChangePassword).Methods(http.MethodGet)
+	p.HandleFunc("/change-password", p.tmplChangePassword).Methods(http.MethodGet)
 	p.HandleFunc("/edit-user", p.handleEditUser)
 	p.HandleFunc("/", p.handleBCAHome).Methods(http.MethodGet)
 
 	p.HandleFunc("/users", p.handleUsers)
 	p.HandleFunc("/users/add", p.tmplAddUser)
 	p.HandleFunc("/users/{userId}", p.handleSimpleUser)
-}
-
-func (s *ProtectedRouter) handleChangePassword(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/bca/change-password.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusTeapot)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	// tmpl.ExecuteTemplate(w, "Content", nil)
-	tmpl.Execute(w, nil)
-
-	return
 }
 
 func (s *ProtectedRouter) handleEditUser(w http.ResponseWriter, r *http.Request) {

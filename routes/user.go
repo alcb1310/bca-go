@@ -192,6 +192,64 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 		}
 
 		tmpl.Execute(w, user)
+	case http.MethodPatch:
+		var oldPassword *string
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if r.FormValue("old") == "" {
+			oldPassword = nil
+		} else {
+			pass := r.FormValue("old")
+			oldPassword = &pass
+		}
+
+		sql := "SELECT password FROM \"user\" WHERE id=$1 and company_id = $2"
+		rows, err := s.db.Query(sql, userId, ctxPayload.CompanyId)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		defer rows.Close()
+		var prev *string
+		prev = nil
+
+		for rows.Next() {
+			var passwd string
+			if err := rows.Scan(&passwd); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			prev = &passwd
+		}
+		if _, err := utils.ComparePassword(*prev, *oldPassword); err != nil {
+			http.Error(w, "Contraseña inválida", http.StatusBadRequest)
+			return
+		}
+
+		var newPassword *string
+		if r.FormValue("new") == "" {
+			newPassword = nil
+		} else {
+			pass := r.FormValue("new")
+			newPassword = &pass
+		}
+
+		savePasswd, err := utils.EncryptPasssword(*newPassword)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		sql = "UPDATE \"user\" SET password = $3 WHERE id=$1 and company_id = $2"
+		if _, err := s.db.Exec(sql, userId, ctxPayload.CompanyId, savePasswd); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, "/api/v1/edit-user", http.StatusPermanentRedirect)
 	case http.MethodDelete:
 		if ctxPayload.Id == userId {
 			http.Error(w, "Can't delete yourself", http.StatusBadRequest)
@@ -211,7 +269,6 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 }
 
 func (s *ProtectedRouter) tmplAddUser(w http.ResponseWriter, r *http.Request) {
-	_, _ = getMyPaload(r)
 	tmpl, err := template.ParseFiles("templates/bca/users/add-user.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusTeapot)
@@ -219,4 +276,15 @@ func (s *ProtectedRouter) tmplAddUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl.Execute(w, nil)
+}
+
+func (s *ProtectedRouter) tmplChangePassword(w http.ResponseWriter, r *http.Request) {
+	ctxPayload, _ := getMyPaload(r)
+	tmpl, err := template.ParseFiles("templates/bca/users/change-password.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusTeapot)
+		return
+	}
+
+	tmpl.Execute(w, ctxPayload)
 }

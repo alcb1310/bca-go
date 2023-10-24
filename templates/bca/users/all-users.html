@@ -15,31 +15,14 @@
                     <td>{{.Name}}</td>
                     <td>{{.RoleId}}</td>
                     <td align="center" class="flex">
-                         <img
-                              src="/css/images/edit-outline.svg" alt="delete button"
-                              width="15px"
-                              hx-get="/api/v1/users/{{.Id}}"
-                              hx-target="#content"
-                              class="mx-3"
-                         />
-                         <img
-                              src="/css/images/trash-outline.svg" alt="delete button"
-                              width="15px"
-                              hx-delete="/api/v1/users/{{.Id}}"
-                              hx-target="#all"
-                              hx-confirm="Est&aacute; seguro de querer eliminar usuario con email: {{.Email}}"
-                         />
+                         <img src="/css/images/edit-outline.svg" alt="delete button" width="15px"
+                              hx-get="/api/v1/users/{{.Id}}" hx-target="#content" class="mx-3" />
+                         <img src="/css/images/trash-outline.svg" alt="delete button" width="15px"
+                              hx-delete="/api/v1/users/{{.Id}}" hx-target="#all"
+                              hx-confirm="Est&aacute; seguro de querer eliminar usuario con email: {{.Email}}" />
                     </td>
                </tr>
                {{ end }}
           </tbody>
      </table>
 </div>
-
-<script>
-     document.body.addEventListener('htmx:beforeSwap', function (evt) {
-          if (evt.detail.xhr.status === 400) {
-               alert("No se puede eliminar al usuario activo")
-          }
-     });
-</script>
