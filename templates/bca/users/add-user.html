@@ -1,0 +1,60 @@
+<div>
+     <!-- when updating make a put request otherwise make a post request  -->
+     <form {{if eq .Id nil}} hx-post="/api/v1/users" {{else}} hx-put="/api/v1/users/{{.Id}}" {{end}}
+          hx-target="#content" hx-swap="innerHTML">
+          <div class="flex justify-between items-center">
+               <h3 class="text-lg font-semibold">{{if ne .Email nil}}Editar{{else}}Crear{{end}} usuario</h3>
+               <div>
+                    <button type="submit"
+                         class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-blue-400">Grabar</button>
+                    <button
+                         class="mt-2 bg-red-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-red-400"
+                         hx-target="#content" hx-get="/api/v1/edit-user">Cancelar</button>
+               </div>
+          </div>
+
+          <div class="flex flex-col">
+               <div>
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" placeholder="Email" {{if ne .Id nil}}value="{{.Email}}"
+                         {{end}} class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+                    <p id="error" class="invisible text-red-700 text-xs">Usuario ya existe</p>
+               </div>
+
+               <div class="mt-4">
+                    <label for="name">Nombre</label>
+                    <input type="text" name="name" id="name" placeholder="Nombre" {{if ne .Id nil}}value="{{.Name}}"
+                         {{end}} class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+
+               </div>
+
+               {{if eq .Id nil}}
+               <div class="mt-4">
+                    <label for="password">Contrase&ntilde;a</label>
+                    <input type="password" name="password" id="password" placeholder="Contrase&ntilde;a"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+
+               </div>
+               {{end}}
+
+               <div class="mt-4">
+                    <label for="role">Rol</label>
+                    <select name="role" id="role"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+                    <option value="">--- Seleccione un rol ---</option>
+                    <option {{if eq .RoleId "a" }}selected{{end}} value="a">admin</option>
+                    <option {{if eq .RoleId "u" }}selected{{end}} value="u">user</option>
+                    </select>
+               </div>
+          </div>
+     </form>
+</div>
+
+<script>
+     document.body.addEventListener('htmx:beforeSwap', function (evt) {
+          if (evt.detail.xhr.status === 409) {
+               let errorEl = document.getElementById("error")
+               errorEl.classList.remove("invisible")
+          }
+     });
+</script>

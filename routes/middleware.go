@@ -61,6 +61,13 @@ func (s *ProtectedRouter) authVerify(next http.Handler) http.Handler {
 			return
 		}
 
+		if r.URL.Path == "/api/v1/edit-user" {
+			if strings.TrimRight(tokenData.Role, " ") != "a" {
+				w.WriteHeader(http.StatusForbidden)
+				return
+			}
+		}
+
 		next.ServeHTTP(w, r)
 	})
 }
