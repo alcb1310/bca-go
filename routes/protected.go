@@ -1,17 +1,17 @@
 package routes
 
 import (
-	"database/sql"
 	"net/http"
 	"text/template"
 
+	"github.com/alcb1310/bca-go-w-test/database"
 	"github.com/gorilla/mux"
 )
 
 type ProtectedRouter struct {
 	*mux.Router
 
-	db *sql.DB
+	db *database.Database
 }
 
 func (s *Router) protectedRoutes() {
@@ -39,7 +39,6 @@ func (s *ProtectedRouter) handleEditUser(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	// tmpl.ExecuteTemplate(w, "Content", nil)
 	tmpl.Execute(w, nil)
 
 	return
@@ -60,8 +59,7 @@ func (s *ProtectedRouter) handleBCAHome(w http.ResponseWriter, r *http.Request) 
 func (s *ProtectedRouter) handleLogout(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		ctxPayload, _ := getMyPaload(r)
-		sql := "DELETE FROM logged_in_user WHERE user_id = $1"
-		if _, err := s.db.Exec(sql, ctxPayload.Id); err != nil {
+		if err := s.db.Logout(ctxPayload.Id); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

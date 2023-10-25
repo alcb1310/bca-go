@@ -9,7 +9,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func ConnectDB() (*sql.DB, error) {
+type Database struct {
+	*sql.DB
+}
+
+func ConnectDB() (*Database, error) {
 	host := os.Getenv("PGHOST")
 	port := os.Getenv("PGPORT")
 	database := os.Getenv("PGDATABASE")
@@ -29,6 +33,8 @@ func ConnectDB() (*sql.DB, error) {
 	if _, err := loadRoles(db); err != nil {
 		log.Println(err)
 	}
+	var retDB Database
+	retDB.DB = db
 
-	return db, nil
+	return &retDB, nil
 }

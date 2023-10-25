@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -14,7 +13,7 @@ import (
 type Router struct {
 	*mux.Router
 
-	db *sql.DB
+	db *database.Database
 }
 
 func NewRouter() *Router {
