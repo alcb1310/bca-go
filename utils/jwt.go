@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/alcb1310/bca-go-w-test/types"
@@ -92,4 +93,17 @@ func (maker *JWTMaker) VerifyToken(token string) (*Payload, error) {
 	}
 
 	return payload, nil
+}
+
+func GenerateToken(u types.User) (string, error) {
+	secretKey := os.Getenv("SECRET")
+	jwtMaker, err := NewJWTMaker(secretKey)
+	if err != nil {
+		return "", err
+	}
+	token, err := jwtMaker.CreateToken(u, 60*time.Minute)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }

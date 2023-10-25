@@ -3,11 +3,8 @@ package routes
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
 	"text/template"
-	"time"
 
 	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
@@ -133,97 +130,11 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var id, email, name, password, company_id, role_id string
-		sql := "SELECT id, email, name, password, company_id, role_id from \"user\" where email = $1"
-		if err := s.db.QueryRow(sql, lc.Email).Scan(&id, &email, &name, &password, &company_id, &role_id); err != nil {
-			// http.Error(w, "Invalid credentials", http.StatusUnauthorized)
-			// tmplString := "<div id=\"#result\"> {{.Error}} </div>"
-			fmt.Println(err.Error())
-			tmplString := "{{.Error}}"
-			tmpl := template.Must(template.New("result").Parse(tmplString))
-			data := map[string]string{
-				"Error": "Invalid credentials",
-			}
-
-			w.WriteHeader(http.StatusUnauthorized)
-			// json.NewEncoder(w).Encode(map[string]string{
-			// "error": "Invalid credentails",
-			// })
-			tmpl.ExecuteTemplate(w, "result", data)
-
-			return
-		}
-		isValid, _ := utils.ComparePassword(password, lc.Password)
-		if !isValid {
-			// http.Error(w, "Invalid credentials", http.StatusUnauthorized)
-			tmplString := "{{.Error}}"
-			tmpl := template.Must(template.New("result").Parse(tmplString))
-			data := map[string]string{
-				"Error": "Invalid credentials",
-			}
-
-			w.WriteHeader(http.StatusUnauthorized)
-			tmpl.ExecuteTemplate(w, "result", data)
-			// json.NewEncoder(w).Encode(map[string]string{
-			// "error": "Invalid credentails",
-			// })
-			return
-		}
-
-		uId, err := uuid.Parse(id)
+		token, err := s.db.Login(lc.Email, lc.Password)
 		if err != nil {
-			// http.Error(w, err.Error(), http.StatusInternalServerError)
-			fmt.Println(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Internal server error",
-			})
-			return
-		}
-		cId, err := uuid.Parse(company_id)
-		if err != nil {
-			// http.Error(w, err.Error(), http.StatusInternalServerError)
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Internal server error",
-			})
-			return
-		}
-		u := types.User{
-			Id:        uId,
-			Email:     email,
-			Name:      name,
-			CompanyId: cId,
-			RoleId:    role_id,
-		}
-		secretKey := os.Getenv("SECRET")
-		jwtMaker, err := utils.NewJWTMaker(secretKey)
-		if err != nil {
-			// http.Error(w, err.Error(), http.StatusUnauthorized)
-			fmt.Println(err.Error())
 			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Invalid credentails",
-			})
-			return
-		}
-		token, err := jwtMaker.CreateToken(u, 60*time.Minute)
-		if err != nil {
-			// http.Error(w, err.Error(), http.StatusUnauthorized)
-			fmt.Println(err.Error())
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Invalid credentails",
-			})
-			return
-		}
-		sql = "INSERT INTO logged_in_user (user_id, token) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET token = $2"
-		if _, err := s.db.Exec(sql, u.Id, []byte(token)); err != nil {
-			// http.Error(w, err.Error(), http.StatusInternalServerError)
-			fmt.Println(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Internal Server Error",
+				"error": err.Error(),
 			})
 			return
 		}
