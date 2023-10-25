@@ -29,7 +29,8 @@
                     <summary class="text-slate-600">Par&aacute;metros</summary>
                     <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Proveedores</p>
                     <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Partidas</p>
-                    <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Proyectos</p>
+                    <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer" hx-target="#content"
+                         hx-swap="innerHTML" hx-get="/api/v1/projects">Proyectos</p>
                </details>
                <details class="px-3">
                     <summary class="text-slate-600">Usuarios</summary>

@@ -30,6 +30,8 @@ func (s *Router) protectedRoutes() {
 	p.HandleFunc("/users", p.handleUsers)
 	p.HandleFunc("/users/add", p.tmplAddUser)
 	p.HandleFunc("/users/{userId}", p.handleSimpleUser)
+
+	p.HandleFunc("/projects", p.handleProject)
 }
 
 func (s *ProtectedRouter) handleEditUser(w http.ResponseWriter, r *http.Request) {
