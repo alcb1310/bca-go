@@ -26,11 +26,8 @@ func (d *Database) AddUser(u UserInfo) error {
 	u.Password = &password
 
 	sql := "INSERT INTO \"user\" (email, name, password, company_id, role_id) VALUES($1, $2, $3, $4, $5)"
-	if _, err := d.Exec(sql, &u.Email, &u.Name, &u.Password, u.CompanyId, &u.Role); err != nil {
-		return err
-	}
-
-	return nil
+	_, err = d.Exec(sql, &u.Email, &u.Name, &u.Password, u.CompanyId, &u.Role)
+	return err
 }
 
 func (d *Database) GetAllUsers(company_id uuid.UUID) ([]types.User, error) {
@@ -65,11 +62,8 @@ func (d *Database) GetAllUsers(company_id uuid.UUID) ([]types.User, error) {
 
 func (d *Database) DeleteUser(user_id, company_id uuid.UUID) error {
 	sql := "DELETE FROM \"user\" WHERE id = $1 and company_id = $2"
-	if _, err := d.Exec(sql, user_id, company_id); err != nil {
-		return err
-	}
-
-	return nil
+	_, err := d.Exec(sql, user_id, company_id)
+	return err
 }
 
 func (d *Database) GetOneUser(user_id, company_id uuid.UUID) (types.User, error) {
@@ -100,4 +94,45 @@ func (d *Database) GetOneUser(user_id, company_id uuid.UUID) (types.User, error)
 	}
 
 	return u, nil
+}
+
+func (d *Database) UpdateUser(u *UserInfo, user_id, company_id uuid.UUID) error {
+	sql := "UPDATE \"user\" SET email=$3, name=$4, role_id=$5 WHERE id=$1 AND company_id = $2"
+	_, err := d.Exec(sql, user_id, company_id, u.Email, u.Name, u.Role)
+	return err
+}
+
+func (d *Database) ChangePassword(oldPassword, newPassword string, user_id, company_id uuid.UUID) error {
+	var prev *string
+
+	sql := "SELECT password FROM \"user\" WHERE id=$1 and company_id = $2"
+	rows, err := d.Query(sql, user_id, company_id)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	prev = nil
+	for rows.Next() {
+		var passwd string
+		if err := rows.Scan(&passwd); err != nil {
+			return err
+		}
+
+		prev = &passwd
+	}
+
+	if _, err := utils.ComparePassword(*prev, oldPassword); err != nil {
+		return err
+	}
+
+	savePasswd, err := utils.EncryptPasssword(newPassword)
+	if err != nil {
+		return err
+	}
+
+	sql = "UPDATE \"user\" SET password = $3 WHERE id=$1 and company_id = $2"
+	_, err = d.Exec(sql, savePasswd, user_id, company_id)
+
+	return err
 }

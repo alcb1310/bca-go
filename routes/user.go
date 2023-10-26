@@ -5,7 +5,6 @@ import (
 	"text/template"
 
 	"github.com/alcb1310/bca-go-w-test/database"
-	"github.com/alcb1310/bca-go-w-test/utils"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
@@ -112,8 +111,7 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 			u.Role = &role
 		}
 
-		sql := "UPDATE \"user\" SET email=$3, name=$4, role_id=$5 WHERE id=$1 AND company_id = $2"
-		if _, err := s.db.Exec(sql, userId, ctxPayload.CompanyId, u.Email, u.Name, u.Role); err != nil {
+		if err := s.db.UpdateUser(u, userId, ctxPayload.CompanyId); err != nil {
 			http.Error(w, err.Error(), http.StatusConflict)
 			return
 		}
@@ -134,7 +132,7 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 
 		tmpl.Execute(w, user)
 	case http.MethodPatch:
-		var oldPassword *string
+		var oldPassword, newPassword *string
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -147,31 +145,6 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 			oldPassword = &pass
 		}
 
-		sql := "SELECT password FROM \"user\" WHERE id=$1 and company_id = $2"
-		rows, err := s.db.Query(sql, userId, ctxPayload.CompanyId)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusNotFound)
-			return
-		}
-		defer rows.Close()
-		var prev *string
-		prev = nil
-
-		for rows.Next() {
-			var passwd string
-			if err := rows.Scan(&passwd); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			prev = &passwd
-		}
-		if _, err := utils.ComparePassword(*prev, *oldPassword); err != nil {
-			http.Error(w, "Contraseña inválida", http.StatusBadRequest)
-			return
-		}
-
-		var newPassword *string
 		if r.FormValue("new") == "" {
 			newPassword = nil
 		} else {
@@ -179,21 +152,14 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 			newPassword = &pass
 		}
 
-		savePasswd, err := utils.EncryptPasssword(*newPassword)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		sql = "UPDATE \"user\" SET password = $3 WHERE id=$1 and company_id = $2"
-		if _, err := s.db.Exec(sql, userId, ctxPayload.CompanyId, savePasswd); err != nil {
+		if err := s.db.ChangePassword(*oldPassword, *newPassword, userId, ctxPayload.CompanyId); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		http.Redirect(w, r, "/api/v1/edit-user", http.StatusPermanentRedirect)
 	case http.MethodDelete:
 		if ctxPayload.Id == userId {
-			http.Error(w, "Can't delete yourself", http.StatusBadRequest)
+			http.Error(w, "No se puede eliminar a si mismo", http.StatusBadRequest)
 			return
 		}
 
