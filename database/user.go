@@ -132,7 +132,7 @@ func (d *Database) ChangePassword(oldPassword, newPassword string, user_id, comp
 	}
 
 	sql = "UPDATE \"user\" SET password = $3 WHERE id=$1 and company_id = $2"
-	_, err = d.Exec(sql, savePasswd, user_id, company_id)
+	_, err = d.Exec(sql, user_id, company_id, savePasswd)
 
 	return err
 }
