@@ -88,34 +88,34 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 
 	switch r.Method {
 	case http.MethodPut:
-		u := &UserInfo{}
+		u := &database.UserInfo{}
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		if r.FormValue("email") == "" {
-			u.email = nil
+			u.Email = nil
 		} else {
 			email := r.FormValue("email")
-			u.email = &email
+			u.Email = &email
 		}
 
 		if r.FormValue("name") == "" {
-			u.name = nil
+			u.Name = nil
 		} else {
 			name := r.FormValue("name")
-			u.name = &name
+			u.Name = &name
 		}
 
 		if r.FormValue("role") == "" {
-			u.role = nil
+			u.Role = nil
 		} else {
 			role := r.FormValue("role")
-			u.role = &role
+			u.Role = &role
 		}
 
 		sql := "UPDATE \"user\" SET email=$3, name=$4, role_id=$5 WHERE id=$1 AND company_id = $2"
-		if _, err := s.db.Exec(sql, userId, ctxPayload.CompanyId, u.email, u.name, u.role); err != nil {
+		if _, err := s.db.Exec(sql, userId, ctxPayload.CompanyId, u.Email, u.Name, u.Role); err != nil {
 			http.Error(w, err.Error(), http.StatusConflict)
 			return
 		}
@@ -220,8 +220,7 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
-		sql := "DELETE FROM \"user\" WHERE id = $1 and company_id = $2"
-		if _, err := s.db.Exec(sql, userId, ctxPayload.CompanyId); err != nil {
+		if err := s.db.DeleteUser(userId, ctxPayload.CompanyId); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

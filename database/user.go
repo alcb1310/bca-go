@@ -60,3 +60,12 @@ func (d *Database) GetAllUsers(company_id uuid.UUID) ([]types.User, error) {
 
 	return users, nil
 }
+
+func (d *Database) DeleteUser(user_id, company_id uuid.UUID) error {
+	sql := "DELETE FROM \"user\" WHERE id = $1 and company_id = $2"
+	if _, err := d.Exec(sql, user_id, company_id); err != nil {
+		return err
+	}
+
+	return nil
+}
