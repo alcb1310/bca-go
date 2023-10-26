@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>
+          {{if ne .Title nil}}
+          {{.Title}}
+          {{else}}
+          SCP
+          {{end}}
+     </title>
+     <link href="/css/output.css" rel="stylesheet">
+     <script src="/css/htmx.min.js"></script>
+</head>
+
+<body>
+     <h1>Base body</h1>
+     <div class="grid grid-cols-12">
+          {{block "nav" .}}{{end}}
+          <div class="col-span-10">
+               <div id="title" class="w-full py-2 px-3 flex justify-between bg-blue-700 text-gray-50 items-center">
+                    <h2 class="mx-3 text-2xl font-bold uppercase">Sistema Control Presupuestario</h2>
+                    <a href="/api/v1/logout" class="mx-3 hover:text-gray-300 text-xs uppercase">salir</a>
+               </div>
+
+               {{block "content" .}}{{end}}
+          </div>
+     </div>
+
+</body>
+
+</html>

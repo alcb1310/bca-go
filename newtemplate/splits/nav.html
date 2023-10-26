@@ -1,0 +1,35 @@
+{{ template "base.html" . }}
+
+{{ define "nav" }}
+
+<nav class="col-span-2 border  border-t-0 border-b-0 border-s-0  border-e-slate-800 h-screen scroll-auto">
+     <h1 class="py-2 px-3 text-2xl font-bold uppercase text-blue-700 t-gray-50 text-center">BCA</h1>
+     <details class="px-3 pt-3">
+          <summary class="text-slate-600">Transacciones</summary>
+          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Presupuesto</p>
+          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Facturas</p>
+          <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Cierre mensual</p>
+     </details>
+     <details class="px-3">
+          <summary class="text-slate-600">Reportes</summary>
+          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Actual</p>
+          <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Hist&oacute;rico</p>
+     </details>
+     <details class="px-3">
+          <summary class="text-slate-600">Par&aacute;metros</summary>
+          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Proveedores</p>
+          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Partidas</p>
+          <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Proyectos</p>
+     </details>
+     <details class="px-3">
+          <summary class="text-slate-600">Usuarios</summary>
+          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">
+               Editar usuario
+          </p>
+          <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">
+               Cambiar contrase&ntilde;a
+          </p>
+     </details>
+</nav>
+
+{{ end }}
