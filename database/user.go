@@ -1,6 +1,8 @@
 package database
 
 import (
+	"strings"
+
 	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
 	"github.com/google/uuid"
@@ -68,4 +70,34 @@ func (d *Database) DeleteUser(user_id, company_id uuid.UUID) error {
 	}
 
 	return nil
+}
+
+func (d *Database) GetOneUser(user_id, company_id uuid.UUID) (types.User, error) {
+	u := types.User{}
+
+	sql := "SELECT user_id, user_email, user_name, role_id FROM user_without_password where company_id = $2 and user_id = $1"
+	rows, err := d.Query(sql, user_id, company_id)
+	if err != nil {
+		return u, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id, email, name, roleId string
+		if err := rows.Scan(&id, &email, &name, &roleId); err != nil {
+			return u, err
+		}
+		foundUserId, err := uuid.Parse(id)
+		if err != nil {
+			return u, err
+		}
+
+		u.Id = foundUserId
+		u.Name = name
+		u.Email = email
+		u.CompanyId = company_id
+		u.RoleId = strings.Trim(roleId, " ")
+	}
+
+	return u, nil
 }

@@ -2,11 +2,9 @@ package routes
 
 import (
 	"net/http"
-	"strings"
 	"text/template"
 
 	"github.com/alcb1310/bca-go-w-test/database"
-	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -122,33 +120,12 @@ func (s *ProtectedRouter) handleSimpleUser(w http.ResponseWriter, r *http.Reques
 
 		http.Redirect(w, r, "/api/v1/edit-user", http.StatusPermanentRedirect)
 	case http.MethodGet:
-		sql := "SELECT user_id, user_email, user_name, role_id FROM user_without_password where company_id = $2 and user_id = $1"
-		rows, err := s.db.Query(sql, userId, ctxPayload.CompanyId)
+		user, err := s.db.GetOneUser(userId, ctxPayload.CompanyId)
 		if err != nil {
-			http.Error(w, "Error al buscar usuarios", http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusTeapot)
 			return
 		}
-		defer rows.Close()
-		user := types.User{}
 
-		for rows.Next() {
-			var id, email, name, roleId string
-			if err := rows.Scan(&id, &email, &name, &roleId); err != nil {
-				http.Error(w, "Error al buscar usuarios", http.StatusInternalServerError)
-				return
-			}
-			foundUserId, err := uuid.Parse(id)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			user.Id = foundUserId
-			user.Name = name
-			user.Email = email
-			user.CompanyId = ctxPayload.CompanyId
-			user.RoleId = strings.Trim(roleId, " ")
-		}
 		tmpl, err := template.ParseFiles("templates/bca/users/add-user.html")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
