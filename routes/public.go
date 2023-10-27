@@ -11,6 +11,11 @@ import (
 	"github.com/google/uuid"
 )
 
+type pageParams struct {
+	Error string
+	Title string
+}
+
 func (s *Router) registerRoute(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		type favContextKey string
@@ -108,9 +113,9 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
-			if err := tmpl.ExecuteTemplate(w, "login.html", map[string]string{
-				"Error": err.Error(),
-				"Title": "BCA - Error",
+			if err := tmpl.ExecuteTemplate(w, "login.html", &pageParams{
+				Error: err.Error(),
+				Title: "BCA - Error",
 			}); err != nil {
 				http.Error(w, err.Error(), http.StatusTeapot)
 				return
@@ -120,12 +125,13 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		var lc types.LoginCredentials
 		lc.Email = r.FormValue("email")
 		lc.Password = r.FormValue("password")
+		errPage := &pageParams{
+			Error: "Credenciales inválidas",
+			Title: "BCA - Error",
+		}
 
 		if lc.Email == "" || !utils.IsValidEmail(lc.Email) {
-			if err := tmpl.ExecuteTemplate(w, "login.html", map[string]string{
-				"Error": "Credenciales inválidas",
-				"Title": "BCA - Error",
-			}); err != nil {
+			if err := tmpl.ExecuteTemplate(w, "login.html", errPage); err != nil {
 				http.Error(w, err.Error(), http.StatusTeapot)
 				return
 			}
@@ -133,10 +139,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 		token, err := s.db.Login(lc.Email, lc.Password)
 		if err != nil {
-			if err := tmpl.ExecuteTemplate(w, "login.html", map[string]string{
-				"Error": "Credenciales inválidas",
-				"Title": "BCA - Error",
-			}); err != nil {
+			if err := tmpl.ExecuteTemplate(w, "login.html", errPage); err != nil {
 				http.Error(w, err.Error(), http.StatusTeapot)
 				return
 			}
@@ -152,8 +155,6 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, cookie)
 
 		http.Redirect(w, r, "/bca/", http.StatusSeeOther)
-		// w.WriteHeader(http.StatusCreated)
-		// fmt.Fprintln(w, "OK")
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
