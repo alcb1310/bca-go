@@ -1,0 +1,19 @@
+{{ template "base.html" . }}
+
+{{ define "content" }}
+<div class="w-full h-screen flex items-center justify-center">
+     <div class="w-{3/4} flex-row gap-3">
+          <h1 class="text-blue-700 text-2xl w-fit mx-auto">Login</h1>
+          <form method="post" action="/login" class="flex-row items-center justify-center">
+               <input name="email" type="email" placeholder="E-mail"
+                    class="mt-2 w-full mx-auto border-gray-400 border p-1 rounded block" />
+               <input name="password" type="password" placeholder="Contraseña"
+                    class="mt-2 w-full border-gray-400 border p-1 rounded block" />
+               <input type="submit" value="Submit"
+                    class="mt-2 bg-blue-700 text-gray-50 block mx-auto w-full px-4 py-2 rounded-full text-center algn-self-end" />
+          </form>
+          <div id="result" class="text-xs text-red-900 mt-2 font-bold"></div>
+          {{ if ne .Error nil}} {{ .Error }} {{ end}}
+     </div>
+</div>
+{{ end }}

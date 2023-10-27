@@ -94,48 +94,52 @@ func (s *Router) registerRoute(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		tmpl, err := template.ParseFiles("templates/login.html")
-		if err != nil {
+	tmpl, err := template.ParseFiles(utils.TEMPLATE_DIR+"login.html", utils.TEMPLATE_DIR+"/splits/base.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusTeapot)
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		if err := tmpl.ExecuteTemplate(w, "login.html", nil); err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
-		tmpl.ExecuteTemplate(w, "login.html", nil)
-
-		return
-	}
-	if r.Method == http.MethodPost {
-		var lc types.LoginCredentials
-		r.ParseForm()
-		json.NewDecoder(r.Body).Decode(&lc)
-		for key, val := range r.Form {
-			if key == "email" {
-				lc.Email = val[0]
-			} else if key == "password" {
-				lc.Password = val[0]
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			if err := tmpl.ExecuteTemplate(w, "login.html", map[string]string{
+				"Error": err.Error(),
+				"Title": "BCA - Error",
+			}); err != nil {
+				http.Error(w, err.Error(), http.StatusTeapot)
+				return
 			}
-		}
-
-		if lc.Email != "" && !utils.IsValidEmail(lc.Email) {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]string{
-				"Message": "Invalid information",
-			})
 			return
 		}
+		var lc types.LoginCredentials
+		lc.Email = r.FormValue("email")
+		lc.Password = r.FormValue("password")
 
-		if lc.Email == "" || lc.Password == "" {
-			w.WriteHeader(http.StatusBadRequest)
+		if lc.Email == "" || !utils.IsValidEmail(lc.Email) {
+			if err := tmpl.ExecuteTemplate(w, "login.html", map[string]string{
+				"Error": "Credenciales inválidas",
+				"Title": "BCA - Error",
+			}); err != nil {
+				http.Error(w, err.Error(), http.StatusTeapot)
+				return
+			}
 			return
 		}
-
 		token, err := s.db.Login(lc.Email, lc.Password)
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": err.Error(),
-			})
+			if err := tmpl.ExecuteTemplate(w, "login.html", map[string]string{
+				"Error": "Credenciales inválidas",
+				"Title": "BCA - Error",
+			}); err != nil {
+				http.Error(w, err.Error(), http.StatusTeapot)
+				return
+			}
 			return
 		}
 
@@ -146,8 +150,11 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 			Secure:   true,
 		}
 		http.SetCookie(w, cookie)
-		w.WriteHeader(http.StatusNoContent)
-		return
+
+		http.Redirect(w, r, "/bca/", http.StatusSeeOther)
+		// w.WriteHeader(http.StatusCreated)
+		// fmt.Fprintln(w, "OK")
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
-	w.WriteHeader(http.StatusMethodNotAllowed)
 }
