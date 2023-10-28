@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 	"text/template"
 
@@ -24,7 +23,7 @@ func (s *Router) protectedRoutes() {
 	// // s.Use(s.jsonResponse)
 	p.Use(p.authVerify)
 
-	// p.HandleFunc("/logout", p.handleLogout).Methods(http.MethodGet)
+	p.HandleFunc("/logout", p.handleLogout)
 	// p.HandleFunc("/change-password", p.tmplChangePassword).Methods(http.MethodGet)
 	// p.HandleFunc("/edit-user", p.handleEditUser)
 	p.HandleFunc("/", p.handleBCAHome)
@@ -45,44 +44,36 @@ func (s *ProtectedRouter) handleBCAHome(w http.ResponseWriter, r *http.Request) 
 		type Ret struct {
 			UserName string
 			Title    string
+			Links    utils.LinksType
 		}
 		retData := Ret{
 			UserName: ctxPayload.Name,
 			Title:    "BCA - home",
+			Links:    *utils.Links,
 		}
-		fmt.Println(retData)
 
 		tmpl.ExecuteTemplate(w, "index.html", retData)
-		// tmpl.ExecuteTemplate(w, "index.html", "Andres")
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
-	// tmpl, err := template.ParseFiles("templates/bca/index.html")
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusTeapot)
-	// 	return
-	// }
-	// w.WriteHeader(http.StatusOK)
-	// tmpl.Execute(w, nil)
-	//
-	// return
 }
 
-//
-// func (s *ProtectedRouter) handleLogout(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method == http.MethodGet {
-// 		ctxPayload, _ := getMyPaload(r)
-// 		if err := s.db.Logout(ctxPayload.Id); err != nil {
-// 			http.Error(w, err.Error(), http.StatusInternalServerError)
-// 			return
-// 		}
-//
-// 		http.Redirect(w, r, "/login", http.StatusSeeOther)
-// 		return
-// 	}
-//
-// 	w.WriteHeader(http.StatusMethodNotAllowed)
-// }
+func (s *ProtectedRouter) handleLogout(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		ctxPayload, _ := getMyPaload(r)
+		if err := s.db.Logout(ctxPayload.Id); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
 //
 // func (s *ProtectedRouter) handleEditUser(w http.ResponseWriter, r *http.Request) {
 // 	tmpl, err := template.ParseFiles("templates/bca/edit-user.html")
