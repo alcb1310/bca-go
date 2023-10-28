@@ -20,7 +20,6 @@ func (s *Router) protectedRoutes() {
 		Router: s.PathPrefix(utils.HTML_PATH_PREFIX).Subrouter(),
 		db:     s.db,
 	}
-	// // s.Use(s.jsonResponse)
 	p.Use(p.authVerify)
 
 	p.HandleFunc("/logout", p.handleLogout)
@@ -28,7 +27,7 @@ func (s *Router) protectedRoutes() {
 	// p.HandleFunc("/edit-user", p.handleEditUser)
 	p.HandleFunc("/", p.handleBCAHome)
 
-	// p.HandleFunc("/users", p.handleUsers)
+	p.HandleFunc("/users", p.handleUsers)
 	// p.HandleFunc("/users/add", p.tmplAddUser)
 	// p.HandleFunc("/users/{userId}", p.handleSimpleUser)
 }
