@@ -27,7 +27,9 @@ func (s *Router) protectedRoutes() {
 
 	p.HandleFunc("/usuarios", p.handleUsers)
 	p.transactionsRoutes()
+	p.reportsRoutes()
 }
+
 func (s *ProtectedRouter) handleBCAHome(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
 	switch r.Method {
