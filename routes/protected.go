@@ -23,13 +23,10 @@ func (s *Router) protectedRoutes() {
 	p.Use(p.authVerify)
 
 	p.HandleFunc("/logout", p.handleLogout)
-	// p.HandleFunc("/change-password", p.tmplChangePassword).Methods(http.MethodGet)
-	// p.HandleFunc("/edit-user", p.handleEditUser)
 	p.HandleFunc("/", p.handleBCAHome)
 
-	p.HandleFunc("/users", p.handleUsers)
-	// p.HandleFunc("/users/add", p.tmplAddUser)
-	// p.HandleFunc("/users/{userId}", p.handleSimpleUser)
+	p.HandleFunc("/usuarios", p.handleUsers)
+	p.transactionsRoutes()
 }
 func (s *ProtectedRouter) handleBCAHome(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
@@ -72,17 +69,3 @@ func (s *ProtectedRouter) handleLogout(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
-
-//
-// func (s *ProtectedRouter) handleEditUser(w http.ResponseWriter, r *http.Request) {
-// 	tmpl, err := template.ParseFiles("templates/bca/edit-user.html")
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusTeapot)
-// 		return
-// 	}
-// 	w.WriteHeader(http.StatusOK)
-// 	tmpl.Execute(w, nil)
-//
-// 	return
-// }
-//

@@ -17,14 +17,14 @@ type LinksType struct {
 }
 
 var Links = &LinksType{
-	Budget:     HTML_PATH_PREFIX + "/budget",
-	Invoices:   HTML_PATH_PREFIX + "/invoices",
-	Closure:    HTML_PATH_PREFIX + "/closure",
-	Actual:     HTML_PATH_PREFIX + "/actual",
-	Historic:   HTML_PATH_PREFIX + "/historic",
-	Supplier:   HTML_PATH_PREFIX + "/supplier",
-	BudgetItem: HTML_PATH_PREFIX + "/budget-item",
-	Proyects:   HTML_PATH_PREFIX + "/proyects",
-	EditUser:   HTML_PATH_PREFIX + "/edit-user",
-	Password:   HTML_PATH_PREFIX + "/password",
+	Budget:     HTML_PATH_PREFIX + "/transacciones/presupuesto",
+	Invoices:   HTML_PATH_PREFIX + "/transacciones/factura",
+	Closure:    HTML_PATH_PREFIX + "/transacciones/cierre",
+	Actual:     HTML_PATH_PREFIX + "/reportes/actual",
+	Historic:   HTML_PATH_PREFIX + "/reportes/historico",
+	Supplier:   HTML_PATH_PREFIX + "/parametros/proveedor",
+	BudgetItem: HTML_PATH_PREFIX + "/parametros/partidas",
+	Proyects:   HTML_PATH_PREFIX + "/parametros/proyectos",
+	EditUser:   HTML_PATH_PREFIX + "/usuarios",
+	Password:   HTML_PATH_PREFIX + "/contrasena",
 }
