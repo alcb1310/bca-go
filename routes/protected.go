@@ -34,13 +34,8 @@ func (s *ProtectedRouter) handleBCAHome(w http.ResponseWriter, r *http.Request) 
 	ctxPayload, _ := getMyPaload(r)
 	switch r.Method {
 	case http.MethodGet:
-		files := []string{
-			utils.TEMPLATE_DIR + "bca/index.html",
-			utils.BaseTemplate,
-			utils.NavTemplate,
-			utils.TitleTemplate,
-		}
-		tmpl, err := template.ParseFiles(files...)
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/index.html")
+		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return

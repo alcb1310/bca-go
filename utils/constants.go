@@ -33,4 +33,10 @@ var (
 	BaseTemplate  string = TEMPLATE_DIR + "base.html"
 	NavTemplate   string = TEMPLATE_DIR + "nav.html"
 	TitleTemplate string = TEMPLATE_DIR + "title.html"
+
+	RequiredFiles []string = []string{
+		BaseTemplate,
+		NavTemplate,
+		TitleTemplate,
+	}
 )
