@@ -1,9 +1,11 @@
 package routes
 
 import (
+	"html/template"
 	"net/http"
 
 	"github.com/alcb1310/bca-go-w-test/database"
+	"github.com/alcb1310/bca-go-w-test/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -28,30 +30,84 @@ func (p *ProtectedRouter) transactionsRoutes() {
 }
 
 func (t *transactionRouter) handleBudget(w http.ResponseWriter, r *http.Request) {
+	ctxPayload, _ := getMyPaload(r)
+	type Ret struct {
+		UserName string
+		Title    string
+		Links    utils.LinksType
+	}
+	retData := Ret{
+		UserName: ctxPayload.Name,
+		Title:    "BCA - home",
+		Links:    *utils.Links,
+	}
+
 	switch r.Method {
 	case http.MethodGet:
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Presupuesto page"))
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/budget.html")
+		tmpl, err := template.ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+
+		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
 func (t *transactionRouter) handleInvoices(w http.ResponseWriter, r *http.Request) {
+	ctxPayload, _ := getMyPaload(r)
+	type Ret struct {
+		UserName string
+		Title    string
+		Links    utils.LinksType
+	}
+	retData := Ret{
+		UserName: ctxPayload.Name,
+		Title:    "BCA - home",
+		Links:    *utils.Links,
+	}
+
 	switch r.Method {
 	case http.MethodGet:
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Facturas page"))
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/invoice.html")
+		tmpl, err := template.ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+
+		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
 func (t *transactionRouter) handleClosure(w http.ResponseWriter, r *http.Request) {
+	ctxPayload, _ := getMyPaload(r)
+	type Ret struct {
+		UserName string
+		Title    string
+		Links    utils.LinksType
+	}
+	retData := Ret{
+		UserName: ctxPayload.Name,
+		Title:    "BCA - home",
+		Links:    *utils.Links,
+	}
+
 	switch r.Method {
 	case http.MethodGet:
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Cierre page"))
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/closure.html")
+		tmpl, err := template.ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+
+		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
