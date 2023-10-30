@@ -1,8 +1,8 @@
 package routes
 
 import (
+	"html/template"
 	"net/http"
-	"text/template"
 
 	"github.com/alcb1310/bca-go-w-test/database"
 	"github.com/alcb1310/bca-go-w-test/utils"
@@ -34,11 +34,18 @@ func (s *ProtectedRouter) handleBCAHome(w http.ResponseWriter, r *http.Request) 
 	ctxPayload, _ := getMyPaload(r)
 	switch r.Method {
 	case http.MethodGet:
-		tmpl, err := template.ParseFiles(utils.TEMPLATE_DIR + "/bca/index.html")
+		files := []string{
+			utils.TEMPLATE_DIR + "bca/index.html",
+			utils.BaseTemplate,
+			utils.NavTemplate,
+			utils.TitleTemplate,
+		}
+		tmpl, err := template.ParseFiles(files...)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return
 		}
+
 		type Ret struct {
 			UserName string
 			Title    string
@@ -50,7 +57,7 @@ func (s *ProtectedRouter) handleBCAHome(w http.ResponseWriter, r *http.Request) 
 			Links:    *utils.Links,
 		}
 
-		tmpl.ExecuteTemplate(w, "index.html", retData)
+		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
