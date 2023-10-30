@@ -25,7 +25,8 @@ func (s *Router) protectedRoutes() {
 	p.HandleFunc("/logout", p.handleLogout)
 	p.HandleFunc("/", p.handleBCAHome)
 
-	p.HandleFunc("/usuarios", p.handleUsers)
+	// p.HandleFunc("/usuarios", p.handleUsers)
+	p.usersRoutes()
 	p.transactionsRoutes()
 	p.reportsRoutes()
 	p.settingsRoutes()
