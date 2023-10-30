@@ -11,7 +11,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func (s *ProtectedRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
 type usersRouter struct {
 	*mux.Router
 
@@ -25,10 +24,13 @@ func (p *ProtectedRouter) usersRoutes() {
 	}
 
 	u.HandleFunc("/", u.handleUsers)
+	u.HandleFunc("/agregar", u.addUser)
+	u.HandleFunc("/{userId}", u.handleSimpleUser)
 }
 
-func (s *usersRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
+func (s *usersRouter) addUser(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
+
 	switch r.Method {
 	case http.MethodPost:
 		u := &database.UserInfo{}
@@ -71,16 +73,15 @@ func (s *usersRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Redirect(w, r, "/api/v1/edit-user", http.StatusPermanentRedirect)
+		http.Redirect(w, r, "/bca/usuarios/", http.StatusPermanentRedirect)
 	case http.MethodGet:
-		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/all-users.html")
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/add-user.html")
 		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return
 		}
 
-		users, err := s.db.GetAllUsers(ctxPayload.CompanyId)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -89,13 +90,11 @@ func (s *usersRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
 			UserName string
 			Title    string
 			Links    utils.LinksType
-			Users    []types.User
 		}
 		retData := Ret{
 			UserName: ctxPayload.Name,
 			Title:    "BCA - Transacciones",
 			Links:    *utils.Links,
-			Users:    users,
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -103,6 +102,38 @@ func (s *usersRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
+}
+
+func (s *usersRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
+	ctxPayload, _ := getMyPaload(r)
+	file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/all-users.html")
+	tmpl, err := template.ParseFiles(file...)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusTeapot)
+		return
+	}
+
+	users, err := s.db.GetAllUsers(ctxPayload.CompanyId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	type Ret struct {
+		UserName string
+		Title    string
+		Links    utils.LinksType
+		Users    []types.User
+	}
+	retData := Ret{
+		UserName: ctxPayload.Name,
+		Title:    "BCA - Transacciones",
+		Links:    *utils.Links,
+		Users:    users,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	tmpl.ExecuteTemplate(w, "base", retData)
+	// }
 }
 
 func (s *usersRouter) handleSimpleUser(w http.ResponseWriter, r *http.Request) {
@@ -187,7 +218,7 @@ func (s *usersRouter) handleSimpleUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/api/v1/edit-user", http.StatusPermanentRedirect)
+		http.Redirect(w, r, "/bca/usuarios/", http.StatusPermanentRedirect)
 	case http.MethodDelete:
 		if ctxPayload.Id == userId {
 			http.Error(w, "No se puede eliminar a si mismo", http.StatusBadRequest)
@@ -198,21 +229,11 @@ func (s *usersRouter) handleSimpleUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/api/v1/edit-user", http.StatusPermanentRedirect)
+		http.Redirect(w, r, "/bca/usuarios", http.StatusPermanentRedirect)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 
-}
-
-func (s *usersRouter) tmplAddUser(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/bca/users/add-user.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusTeapot)
-		return
-	}
-
-	tmpl.Execute(w, nil)
 }
 
 func (s *usersRouter) tmplChangePassword(w http.ResponseWriter, r *http.Request) {
