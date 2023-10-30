@@ -28,3 +28,9 @@ var Links = &LinksType{
 	EditUser:   HTML_PATH_PREFIX + "/usuarios",
 	Password:   HTML_PATH_PREFIX + "/contrasena",
 }
+
+var (
+	BaseTemplate  string = TEMPLATE_DIR + "base.html"
+	NavTemplate   string = TEMPLATE_DIR + "nav.html"
+	TitleTemplate string = TEMPLATE_DIR + "title.html"
+)
