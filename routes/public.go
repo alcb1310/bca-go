@@ -99,7 +99,11 @@ func (s *Router) registerRoute(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles(utils.TEMPLATE_DIR+"login.html", utils.TEMPLATE_DIR+"/splits/base.html")
+	files := []string{
+		utils.BaseTemplate,
+		utils.TEMPLATE_DIR + "login.html",
+	}
+	tmpl, err := template.ParseFiles(files...)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusTeapot)
 		return
@@ -107,13 +111,13 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		if err := tmpl.ExecuteTemplate(w, "login.html", nil); err != nil {
+		if err := tmpl.ExecuteTemplate(w, "base", nil); err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return
 		}
 	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
-			if err := tmpl.ExecuteTemplate(w, "login.html", &pageParams{
+			if err := tmpl.ExecuteTemplate(w, "base", &pageParams{
 				Error: err.Error(),
 				Title: "BCA - Error",
 			}); err != nil {
@@ -131,7 +135,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if lc.Email == "" || !utils.IsValidEmail(lc.Email) {
-			if err := tmpl.ExecuteTemplate(w, "login.html", errPage); err != nil {
+			if err := tmpl.ExecuteTemplate(w, "base", errPage); err != nil {
 				http.Error(w, err.Error(), http.StatusTeapot)
 				return
 			}
@@ -139,7 +143,7 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 		token, err := s.db.Login(lc.Email, lc.Password)
 		if err != nil {
-			if err := tmpl.ExecuteTemplate(w, "login.html", errPage); err != nil {
+			if err := tmpl.ExecuteTemplate(w, "base", errPage); err != nil {
 				http.Error(w, err.Error(), http.StatusTeapot)
 				return
 			}
