@@ -4,29 +4,32 @@
      <h1 class="py-2 px-3 text-2xl font-bold uppercase text-blue-700 t-gray-50 text-center">BCA</h1>
      <details class="px-3 pt-3">
           <summary class="text-slate-600">Transacciones</summary>
-          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Presupuesto</p>
-          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Facturas</p>
-          <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Cierre mensual</p>
+          <a href="{{.Links.Budget}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">Presupuesto</a>
+          <a href="{{.Links.Invoices}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">Facturas</a>
+          <a href="{{.Links.Closure}}" class="block px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Cierre
+               mensual</a>
      </details>
      <details class="px-3">
           <summary class="text-slate-600">Reportes</summary>
-          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Actual</p>
-          <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Hist&oacute;rico</p>
+          <a href="{{.Links.Actual}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">Actual</a>
+          <a href="{{.Links.Historic}}"
+               class="block px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Hist&oacute;rico</a>
      </details>
      <details class="px-3">
           <summary class="text-slate-600">Par&aacute;metros</summary>
-          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Proveedores</p>
-          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">Partidas</p>
-          <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Proyectos</p>
+          <a href="{{.Links.Supplier}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">Proveedores</a>
+          <a href="{{.Links.BudgetItem}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">Partidas</a>
+          <a href="{{.Links.Projects}}"
+               class="block px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Proyectos</a>
      </details>
      <details class="px-3">
           <summary class="text-slate-600">Usuarios</summary>
-          <p class="px-5 text-slate-600 text-sm hover:cursor-pointer">
+          <a href="{{.Links.EditUser}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">
                Editar usuario
-          </p>
-          <p class="px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">
+          </a>
+          <a href="{{.Links.Password}}" class="block px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">
                Cambiar contrase&ntilde;a
-          </p>
+          </a>
      </details>
 </nav>
 

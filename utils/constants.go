@@ -11,7 +11,7 @@ type LinksType struct {
 	Historic   string
 	Supplier   string
 	BudgetItem string
-	Proyects   string
+	Projects   string
 	EditUser   string
 	Password   string
 }
@@ -24,7 +24,7 @@ var Links = &LinksType{
 	Historic:   HTML_PATH_PREFIX + "/reportes/historico",
 	Supplier:   HTML_PATH_PREFIX + "/parametros/proveedor",
 	BudgetItem: HTML_PATH_PREFIX + "/parametros/partidas",
-	Proyects:   HTML_PATH_PREFIX + "/parametros/proyectos",
+	Projects:   HTML_PATH_PREFIX + "/parametros/proyectos",
 	EditUser:   HTML_PATH_PREFIX + "/usuarios",
 	Password:   HTML_PATH_PREFIX + "/contrasena",
 }
