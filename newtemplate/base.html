@@ -1,3 +1,4 @@
+{{ define "base" }}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,11 +18,14 @@
 
 <body>
      <div class="grid grid-cols-12">
+          {{block "nav" .}}{{end}}
           <div class="col-span-10">
-               {{block "content" .}}{{end}}
+               {{block "title" .}}{{end}}
+               {{block "Content" .}}{{end}}
           </div>
      </div>
 
 </body>
 
 </html>
+{{ end }}
