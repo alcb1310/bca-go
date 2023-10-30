@@ -38,7 +38,7 @@ func (t *transactionRouter) handleBudget(w http.ResponseWriter, r *http.Request)
 	}
 	retData := Ret{
 		UserName: ctxPayload.Name,
-		Title:    "BCA - home",
+		Title:    "BCA - Transacciones",
 		Links:    *utils.Links,
 	}
 
@@ -66,7 +66,7 @@ func (t *transactionRouter) handleInvoices(w http.ResponseWriter, r *http.Reques
 	}
 	retData := Ret{
 		UserName: ctxPayload.Name,
-		Title:    "BCA - home",
+		Title:    "BCA - Transacciones",
 		Links:    *utils.Links,
 	}
 
@@ -94,7 +94,7 @@ func (t *transactionRouter) handleClosure(w http.ResponseWriter, r *http.Request
 	}
 	retData := Ret{
 		UserName: ctxPayload.Name,
-		Title:    "BCA - home",
+		Title:    "BCA - Transacciones",
 		Links:    *utils.Links,
 	}
 

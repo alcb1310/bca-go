@@ -1,9 +1,11 @@
 package routes
 
 import (
+	"html/template"
 	"net/http"
 
 	"github.com/alcb1310/bca-go-w-test/database"
+	"github.com/alcb1310/bca-go-w-test/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -27,20 +29,56 @@ func (p *ProtectedRouter) reportsRoutes() {
 }
 
 func (t *reportsRouter) handleActual(w http.ResponseWriter, r *http.Request) {
+	ctxPayload, _ := getMyPaload(r)
+	type Ret struct {
+		UserName string
+		Title    string
+		Links    utils.LinksType
+	}
+	retData := Ret{
+		UserName: ctxPayload.Name,
+		Title:    "BCA - Reportes",
+		Links:    *utils.Links,
+	}
+
 	switch r.Method {
 	case http.MethodGet:
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Actual page"))
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/reports/actual.html")
+		tmpl, err := template.ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+
+		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
 func (t *reportsRouter) handleHistoric(w http.ResponseWriter, r *http.Request) {
+	ctxPayload, _ := getMyPaload(r)
+	type Ret struct {
+		UserName string
+		Title    string
+		Links    utils.LinksType
+	}
+	retData := Ret{
+		UserName: ctxPayload.Name,
+		Title:    "BCA - Reportes",
+		Links:    *utils.Links,
+	}
+
 	switch r.Method {
 	case http.MethodGet:
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Historico page"))
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/reports/historic.html")
+		tmpl, err := template.ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+
+		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
