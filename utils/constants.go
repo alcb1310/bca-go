@@ -1,6 +1,6 @@
 package utils
 
-const TEMPLATE_DIR = "newtemplate/"
+const TEMPLATE_DIR = "templates/"
 const HTML_PATH_PREFIX = "/bca"
 
 type LinksType struct {
@@ -25,8 +25,8 @@ var Links = &LinksType{
 	Supplier:   HTML_PATH_PREFIX + "/parametros/proveedor",
 	BudgetItem: HTML_PATH_PREFIX + "/parametros/partidas",
 	Projects:   HTML_PATH_PREFIX + "/parametros/proyectos",
-	EditUser:   HTML_PATH_PREFIX + "/usuarios",
-	Password:   HTML_PATH_PREFIX + "/contrasena",
+	EditUser:   HTML_PATH_PREFIX + "/usuarios/",
+	Password:   HTML_PATH_PREFIX + "/usuarios/contrasena",
 }
 
 var (

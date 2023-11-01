@@ -1,41 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>BCA - Login</title>
-     <link href="/css/output.css" rel="stylesheet">
-     <script src="/css/htmx.min.js"></script>
-</head>
-
-<body>
-     <div class="w-full h-screen flex items-center justify-center">
-          <div class="w-{3/4} flex-row gap-3">
-               <h1 class="text-blue-700 text-2xl w-fit mx-auto">Login</h1>
-               <form hx-post="/login" hx-target="#result" hx-swap="innerHTML"
-                    class="flex-row items-center justify-center">
-                    <input name="email" type="email" placeholder="E-mail"
-                         class="mt-2 w-full mx-auto border-gray-400 border p-1 rounded block" />
-                    <input name="password" type="password" placeholder="Contraseña"
-                         class="mt-2 w-full border-gray-400 border p-1 rounded block" />
-                    <input type="submit" value="Submit"
-                         class="mt-2 bg-blue-700 text-gray-50 block mx-auto w-full px-4 py-2 rounded-full text-center algn-self-end" />
-               </form>
-               <div id="result" class="text-xs text-red-900 mt-2 font-bold"></div>
-          </div>
+{{ define "Content" }}
+<div class="w-full h-screen flex items-center justify-center">
+     <div class="w-{3/4} flex-row gap-3">
+          <h1 class="text-blue-700 text-2xl w-fit mx-auto">Login</h1>
+          <form method="post" action="/login" class="flex-row items-center justify-center">
+               <input name="email" type="email" placeholder="E-mail"
+                    class="mt-2 w-full mx-auto border-gray-400 border p-1 rounded block" />
+               <input name="password" type="password" placeholder="Contraseña"
+                    class="mt-2 w-full border-gray-400 border p-1 rounded block" />
+               <div id="result" class="text-xs text-red-700 mt-2 text-center">
+                    {{ if ne .Error nil}} {{ .Error }} {{ end}}
+               </div>
+               <input type="submit" value="Submit"
+                    class="mt-2 bg-blue-700 text-gray-50 block mx-auto w-full px-4 py-2 rounded text-center algn-self-end" />
+          </form>
      </div>
-</body>
-
-<script>
-     document.body.addEventListener('htmx:beforeSwap', function (evt) {
-          if (evt.detail.xhr.status === 401) {
-               evt.detail.shouldSwap = true
-               evt.detail.isError = false
-          } else if (evt.detail.xhr.status === 204) {
-               window.location.replace("/api/v1/")
-          }
-     });
-</script>
-
-</html>
+</div>
+{{ end }}
