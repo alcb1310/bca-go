@@ -5,7 +5,6 @@ import (
 	"text/template"
 
 	"github.com/alcb1310/bca-go-w-test/database"
-	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -28,10 +27,26 @@ func (p *ProtectedRouter) usersRoutes() {
 	u.HandleFunc("/{userId}", u.handleSimpleUser)
 }
 
+var retData = make(map[string]interface{})
+
 func (s *usersRouter) addUser(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
 
+	file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/add-user.html")
+	tmpl, err := template.ParseFiles(file...)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusTeapot)
+		return
+	}
+
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Transacciones"
+	retData["Links"] = *utils.Links
+
 	switch r.Method {
+	case http.MethodGet:
+		w.WriteHeader(http.StatusOK)
+		tmpl.ExecuteTemplate(w, "base", retData)
 	case http.MethodPost:
 		u := &database.UserInfo{}
 		// Data sanitization
@@ -69,36 +84,14 @@ func (s *usersRouter) addUser(w http.ResponseWriter, r *http.Request) {
 
 		u.CompanyId = ctxPayload.CompanyId
 		if err := s.db.AddUser(*u); err != nil {
-			http.Error(w, err.Error(), http.StatusConflict)
+			retData["Error"] = err.Error()
+			w.WriteHeader(http.StatusConflict)
+			tmpl.ExecuteTemplate(w, "base", retData)
 			return
 		}
 
-		http.Redirect(w, r, "/bca/usuarios/", http.StatusPermanentRedirect)
-	case http.MethodGet:
-		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/add-user.html")
-		tmpl, err := template.ParseFiles(file...)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusTeapot)
-			return
-		}
-
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		type Ret struct {
-			UserName string
-			Title    string
-			Links    utils.LinksType
-		}
-		retData := Ret{
-			UserName: ctxPayload.Name,
-			Title:    "BCA - Transacciones",
-			Links:    *utils.Links,
-		}
-
-		w.WriteHeader(http.StatusOK)
-		tmpl.ExecuteTemplate(w, "base", retData)
+		r.Method = http.MethodGet
+		http.Redirect(w, r, "/bca/usuarios/", http.StatusSeeOther)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -106,34 +99,30 @@ func (s *usersRouter) addUser(w http.ResponseWriter, r *http.Request) {
 
 func (s *usersRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
-	file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/all-users.html")
-	tmpl, err := template.ParseFiles(file...)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusTeapot)
-		return
-	}
 
-	users, err := s.db.GetAllUsers(ctxPayload.CompanyId)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	type Ret struct {
-		UserName string
-		Title    string
-		Links    utils.LinksType
-		Users    []types.User
-	}
-	retData := Ret{
-		UserName: ctxPayload.Name,
-		Title:    "BCA - Transacciones",
-		Links:    *utils.Links,
-		Users:    users,
-	}
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Transacciones"
+	retData["Links"] = *utils.Links
+	switch r.Method {
+	case http.MethodGet:
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/all-users.html")
+		tmpl, err := template.ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
 
-	w.WriteHeader(http.StatusOK)
-	tmpl.ExecuteTemplate(w, "base", retData)
-	// }
+		retData["Users"], err = s.db.GetAllUsers(ctxPayload.CompanyId)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		tmpl.ExecuteTemplate(w, "base", retData)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
 
 func (s *usersRouter) handleSimpleUser(w http.ResponseWriter, r *http.Request) {
@@ -229,7 +218,9 @@ func (s *usersRouter) handleSimpleUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/bca/usuarios", http.StatusPermanentRedirect)
+
+		r.Method = http.MethodGet
+		http.Redirect(w, r, "/bca/usuarios/", http.StatusSeeOther)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
