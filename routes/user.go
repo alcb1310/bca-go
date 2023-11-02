@@ -24,11 +24,60 @@ func (p *ProtectedRouter) usersRoutes() {
 
 	u.HandleFunc("/", u.handleUsers)
 	u.HandleFunc("/agregar", u.addUser)
+	u.HandleFunc("/contrasena", u.passwordRoute)
 	u.HandleFunc("/agregar/{userId}", u.updateUser)
 	u.HandleFunc("/{userId}", u.handleSimpleUser)
 }
 
 var retData = make(map[string]interface{})
+
+func (s *usersRouter) passwordRoute(w http.ResponseWriter, r *http.Request) {
+	file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/password.html")
+	tmpl, err := template.ParseFiles(file...)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusTeapot)
+		return
+	}
+
+	ctxPayload, _ := getMyPaload(r)
+	switch r.Method {
+	case http.MethodGet:
+		tmpl.ExecuteTemplate(w, "base", retData)
+
+	case http.MethodPost:
+		var oldPassword, newPassword *string
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if r.FormValue("old") == "" {
+			oldPassword = nil
+		} else {
+			pass := r.FormValue("old")
+			oldPassword = &pass
+		}
+
+		if r.FormValue("new") == "" {
+			newPassword = nil
+		} else {
+			pass := r.FormValue("new")
+			newPassword = &pass
+		}
+
+		if err := s.db.ChangePassword(*oldPassword, *newPassword, ctxPayload.Id, ctxPayload.CompanyId); err != nil {
+			retData["Error"] = "Contraseña inválida"
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		}
+		delete(retData, "Error")
+		r.Method = http.MethodGet
+		http.Redirect(w, r, "/bca/usuarios/contrasena", http.StatusSeeOther)
+
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
 
 func (s *usersRouter) updateUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -95,6 +144,7 @@ func (s *usersRouter) addUser(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
+		delete(retData, "User")
 		w.WriteHeader(http.StatusOK)
 		tmpl.ExecuteTemplate(w, "base", retData)
 	case http.MethodPost:
@@ -200,32 +250,6 @@ func (s *usersRouter) handleSimpleUser(w http.ResponseWriter, r *http.Request) {
 		retData["User"] = user
 
 		tmpl.ExecuteTemplate(w, "base", retData)
-	case http.MethodPatch:
-		var oldPassword, newPassword *string
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		if r.FormValue("old") == "" {
-			oldPassword = nil
-		} else {
-			pass := r.FormValue("old")
-			oldPassword = &pass
-		}
-
-		if r.FormValue("new") == "" {
-			newPassword = nil
-		} else {
-			pass := r.FormValue("new")
-			newPassword = &pass
-		}
-
-		if err := s.db.ChangePassword(*oldPassword, *newPassword, userId, ctxPayload.CompanyId); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, r, "/bca/usuarios/", http.StatusPermanentRedirect)
 	case http.MethodDelete:
 		if ctxPayload.Id == userId {
 			http.Error(w, "No se puede eliminar a si mismo", http.StatusBadRequest)
@@ -243,15 +267,4 @@ func (s *usersRouter) handleSimpleUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 
-}
-
-func (s *usersRouter) tmplChangePassword(w http.ResponseWriter, r *http.Request) {
-	ctxPayload, _ := getMyPaload(r)
-	tmpl, err := template.ParseFiles("templates/bca/users/change-password.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusTeapot)
-		return
-	}
-
-	tmpl.Execute(w, ctxPayload)
 }
