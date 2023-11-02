@@ -3,13 +3,13 @@
 ## Tech Stack
 
 - Go [![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](http://go.dev)
-- PostgreSQL [[!PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+- PostgreSQL [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 - HTMX [https://htmx.org/](https://htmx.org/)
 
 ## Socials
 
-- [[!Twitter Badge](https://img.shields.io/twitter/follow/username.svg?style=social&label=Follow)](https://twitter.com/alcb1310)
-- [[!Github Badg](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/alcb1310)
+- [![Twitter Badge](https://img.shields.io/twitter/follow/username.svg?style=social&label=Follow)](https://twitter.com/alcb1310)
+- [![Github Badg](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/alcb1310)
 
 ## Description
 
