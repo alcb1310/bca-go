@@ -17,6 +17,10 @@ The objective of this application is to manage the budget of a construction comp
 - Each invoice will decrease the budgeted data
 - Several reports to be defined
 
+## Table of contents
+
+- [Screens](#screens)
+
 ## Screens
 
 In order to achieve the project's description, the application will have both public and protected Endpoints
