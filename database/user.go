@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"strings"
 
 	"github.com/alcb1310/bca-go-w-test/types"
@@ -30,9 +31,19 @@ func (d *Database) AddUser(u UserInfo) error {
 	return err
 }
 
-func (d *Database) GetAllUsers(company_id uuid.UUID) ([]types.User, error) {
+func (d *Database) GetAllUsers(company_id uuid.UUID, searchParam string) ([]types.User, error) {
+	var rows *sql.Rows
+	var err error
 	sql := "SELECT user_id, user_email, user_name, role_name FROM user_without_password WHERE company_id=$1"
-	rows, err := d.Query(sql, company_id)
+
+	if searchParam != "" {
+		sql += " AND user_email like $2"
+		query := "%" + searchParam + "%"
+		rows, err = d.Query(sql, company_id, query)
+	} else {
+		rows, err = d.Query(sql, company_id)
+	}
+
 	if err != nil {
 		return nil, err
 	}

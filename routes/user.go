@@ -155,6 +155,7 @@ func (s *usersRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
 	retData["Links"] = *utils.Links
 	switch r.Method {
 	case http.MethodGet:
+		searchParam := r.URL.Query().Get("usuario")
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/all-users.html")
 		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
@@ -162,7 +163,7 @@ func (s *usersRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		retData["Users"], err = s.db.GetAllUsers(ctxPayload.CompanyId)
+		retData["Users"], err = s.db.GetAllUsers(ctxPayload.CompanyId, searchParam)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
