@@ -1,0 +1,64 @@
+{{ define "Content" }}
+<div class="m-3">
+     <!-- when updating make a put request otherwise make a post request  -->
+     <form method="post"
+          action="{{ if eq .User nil }} /bca/usuarios/agregar {{ else }} /bca/usuarios/agregar/{{.User.Id}} {{ end }}">
+          <div class="flex justify-between items-center">
+               <h3 class="text-lg font-semibold">
+                    {{ if eq .User nil }}
+                    Crear
+                    {{ else }}
+                    Editar
+                    {{ end }}
+                    Usuario
+               </h3>
+               <div>
+                    <button type="submit"
+                         class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-blue-400">Grabar</button>
+                    <a href="/bca/usuarios/"
+                         class="mt-2 bg-red-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-red-400">Cancelar</a>
+               </div>
+          </div>
+
+          <div class="flex flex-col">
+               <div>
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" placeholder="Email" required
+                         value="{{if ne .User nil}}{{.User.Email}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+                    <p id="error" class="text-red-700 text-xs">
+                         {{.Error}}
+                    </p>
+               </div>
+
+               <div class="mt-4">
+                    <label for="name">Nombre</label>
+                    <input type="text" name="name" id="name" placeholder="Nombre" required
+                         value="{{if ne .User nil}}{{.User.Name}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+
+               </div>
+
+               {{ if eq .User nil }}
+               <div class="mt-4">
+                    <label for="password">Contrase&ntilde;a</label>
+                    <input type="password" name="password" id="password" placeholder="Contrase&ntilde;a" required
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+
+               </div>
+               {{ end }}
+
+               <div class="mt-4">
+                    <label for="role">Rol</label>
+                    <select name="role" id="role"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+
+                    <option value="a" {{if eq .User.RoleId "a" }}selected{{end}}>admin</option>
+                    <option value="u" {{if eq .User.RoleId "u" }}selected{{end}}>user</option>
+                    </select>
+               </div>
+          </div>
+     </form>
+</div>
+
+{{ end }}

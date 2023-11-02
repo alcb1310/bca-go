@@ -61,6 +61,13 @@ func (s *ProtectedRouter) authVerify(next http.Handler) http.Handler {
 			return
 		}
 
+		if r.URL.Path == "/api/v1/edit-user" {
+			if strings.TrimRight(tokenData.Role, " ") != "a" {
+				w.WriteHeader(http.StatusForbidden)
+				return
+			}
+		}
+
 		next.ServeHTTP(w, r)
 	})
 }
@@ -69,6 +76,7 @@ type contextPayload struct {
 	Id         uuid.UUID `json:"id"`
 	Email      string    `json:"email"`
 	CompanyId  uuid.UUID `json:"company_id"`
+	Name       string    `json:"name"`
 	Role       string    `json:"role"`
 	IsLoggedIn bool      `json:"is_logged_in"`
 	IssuedAt   time.Time `json:"issued_at"`
