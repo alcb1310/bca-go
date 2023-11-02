@@ -1,0 +1,38 @@
+{{ define "nav" }}
+
+<nav class="col-span-2 border  border-t-0 border-b-0 border-s-0  border-e-slate-800 h-screen scroll-auto">
+     <h1 class="py-2 px-3 text-2xl font-bold uppercase text-blue-700 t-gray-50 text-center">
+          <a href="/bca/">BCA</a>
+     </h1>
+     <details class="px-3 pt-3">
+          <summary class="text-slate-600">Transacciones</summary>
+          <a href="{{.Links.Budget}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">Presupuesto</a>
+          <a href="{{.Links.Invoices}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">Facturas</a>
+          <a href="{{.Links.Closure}}" class="block px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Cierre
+               mensual</a>
+     </details>
+     <details class="px-3">
+          <summary class="text-slate-600">Reportes</summary>
+          <a href="{{.Links.Actual}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">Actual</a>
+          <a href="{{.Links.Historic}}"
+               class="block px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Hist&oacute;rico</a>
+     </details>
+     <details class="px-3">
+          <summary class="text-slate-600">Par&aacute;metros</summary>
+          <a href="{{.Links.Supplier}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">Proveedores</a>
+          <a href="{{.Links.BudgetItem}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">Partidas</a>
+          <a href="{{.Links.Projects}}"
+               class="block px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">Proyectos</a>
+     </details>
+     <details class="px-3">
+          <summary class="text-slate-600">Usuarios</summary>
+          <a href="{{.Links.EditUser}}" class="block px-5 text-slate-600 text-sm hover:cursor-pointer">
+               Editar usuario
+          </a>
+          <a href="{{.Links.Password}}" class="block px-5 text-slate-600 text-sm mb-4 hover:cursor-pointer">
+               Cambiar contrase&ntilde;a
+          </a>
+     </details>
+</nav>
+
+{{ end }}
