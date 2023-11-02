@@ -2,9 +2,14 @@
 
 ## Tech Stack
 
-- Go [http://go.dev/](http://go.dev)
-- PostgreSQL [https://www.postgresql.org/](https://www.postgresql.org/)
-- HTMX [https://htmx.org/](https://htmx.org/)
+- [![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](http://go.dev)
+- [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+- [https://htmx.org/](https://htmx.org/)
+
+## Socials
+
+[![Twitter Badge](https://img.shields.io/twitter/follow/username.svg?style=social&label=Follow)](https://twitter.com/alcb1310)
+[![Github Badg](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/alcb1310)
 
 ## Description
 
@@ -17,18 +22,34 @@ The objective of this application is to manage the budget of a construction comp
 - Each invoice will decrease the budgeted data
 - Several reports to be defined
 
-## Endpoints
+## Table of contents
+
+- [Screens](#screens)
+    - [Login](#login)
+    - [Home](#home)
+    - [Users](#users)
+
+## Screens
 
 In order to achieve the project's description, the application will have both public and protected Endpoints
 
-### Public Endpoints
+### Login
 
-***/login***<br />
-This endpoint will allow you to access all the protected routes, as a user you will have to provide your credentials (email and password) and if authorized you will be able to read the protected routes.
+The application will start at the `/login` route which allows a user to login to it by providing their email and password, then the
+server will validate their credentials, and on success it will go to the protected routes and if it didn't succeed, it will display
+a message indicating `invalid credentials`
 
-### Protected Endpoints
+### Home
 
-***/api/v1/***<br />
-This endpoint will show the logged in application home page, with a collapsable menu in the left side of the screen.  All interactions should be displayed on the content part of the HTML
-for navigating and interacting with the application, we will be using HTMX
+All the application will reside inside the `/bca/` route, and display the menu at the left pane and on its top displays an exit button,
+which will logout the user and in its main pane it will display a greeting to the logged in user
 
+### Users
+
+Within the **Usuarios** menu, there will be 2 options
+
+- `Editar usuario`
+This option will allow a user with admin privileges to create, update and delete users from the application
+
+- `Cambiar contraseaña`
+This option will allow any user to change their password to access de application

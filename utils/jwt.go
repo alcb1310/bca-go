@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/alcb1310/bca-go-w-test/types"
@@ -19,6 +20,7 @@ type Payload struct {
 	ID         uuid.UUID `json:"id"`
 	Email      string    `json:"email"`
 	CompanyId  uuid.UUID `json:"company_id"`
+	Name       string    `json:"name"`
 	Role       string    `json:"role"`
 	IsLoggedIn bool      `json:"is_logged_in"`
 	IssuedAt   time.Time `json:"issued_at"`
@@ -46,6 +48,7 @@ func NewPayload(u types.User, duration time.Duration) *Payload {
 		ID:         u.Id,
 		Email:      u.Email,
 		CompanyId:  u.CompanyId,
+		Name:       u.Name,
 		Role:       u.RoleId,
 		IsLoggedIn: true,
 		IssuedAt:   time.Now(),
@@ -92,4 +95,17 @@ func (maker *JWTMaker) VerifyToken(token string) (*Payload, error) {
 	}
 
 	return payload, nil
+}
+
+func GenerateToken(u types.User) (string, error) {
+	secretKey := os.Getenv("SECRET")
+	jwtMaker, err := NewJWTMaker(secretKey)
+	if err != nil {
+		return "", err
+	}
+	token, err := jwtMaker.CreateToken(u, 60*time.Minute)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }

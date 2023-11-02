@@ -3,16 +3,18 @@ package routes
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
 	"text/template"
-	"time"
 
 	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
 	"github.com/google/uuid"
 )
+
+type pageParams struct {
+	Error string
+	Title string
+}
 
 func (s *Router) registerRoute(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
@@ -97,134 +99,54 @@ func (s *Router) registerRoute(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		tmpl, err := template.ParseFiles("templates/login.html")
-		if err != nil {
+	files := []string{
+		utils.BaseTemplate,
+		utils.TEMPLATE_DIR + "login.html",
+	}
+	tmpl, err := template.ParseFiles(files...)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusTeapot)
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		if err := tmpl.ExecuteTemplate(w, "base", nil); err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
-		tmpl.ExecuteTemplate(w, "login.html", nil)
-
-		return
-	}
-	if r.Method == http.MethodPost {
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			if err := tmpl.ExecuteTemplate(w, "base", &pageParams{
+				Error: err.Error(),
+				Title: "BCA - Error",
+			}); err != nil {
+				http.Error(w, err.Error(), http.StatusTeapot)
+				return
+			}
+			return
+		}
 		var lc types.LoginCredentials
-		r.ParseForm()
-		json.NewDecoder(r.Body).Decode(&lc)
-		for key, val := range r.Form {
-			if key == "email" {
-				lc.Email = val[0]
-			} else if key == "password" {
-				lc.Password = val[0]
+		lc.Email = r.FormValue("email")
+		lc.Password = r.FormValue("password")
+		errPage := &pageParams{
+			Error: "Credenciales inválidas",
+			Title: "BCA - Error",
+		}
+
+		if lc.Email == "" || !utils.IsValidEmail(lc.Email) {
+			if err := tmpl.ExecuteTemplate(w, "base", errPage); err != nil {
+				http.Error(w, err.Error(), http.StatusTeapot)
+				return
 			}
-		}
-
-		if lc.Email != "" && !utils.IsValidEmail(lc.Email) {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]string{
-				"Message": "Invalid information",
-			})
 			return
 		}
-
-		if lc.Email == "" || lc.Password == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		var id, email, name, password, company_id, role_id string
-		sql := "SELECT id, email, name, password, company_id, role_id from \"user\" where email = $1"
-		if err := s.db.QueryRow(sql, lc.Email).Scan(&id, &email, &name, &password, &company_id, &role_id); err != nil {
-			// http.Error(w, "Invalid credentials", http.StatusUnauthorized)
-			// tmplString := "<div id=\"#result\"> {{.Error}} </div>"
-			fmt.Println(err.Error())
-			tmplString := "{{.Error}}"
-			tmpl := template.Must(template.New("result").Parse(tmplString))
-			data := map[string]string{
-				"Error": "Invalid credentials",
+		token, err := s.db.Login(lc.Email, lc.Password)
+		if err != nil {
+			if err := tmpl.ExecuteTemplate(w, "base", errPage); err != nil {
+				http.Error(w, err.Error(), http.StatusTeapot)
+				return
 			}
-
-			w.WriteHeader(http.StatusUnauthorized)
-			// json.NewEncoder(w).Encode(map[string]string{
-			// "error": "Invalid credentails",
-			// })
-			tmpl.ExecuteTemplate(w, "result", data)
-
-			return
-		}
-		isValid, _ := utils.ComparePassword(password, lc.Password)
-		if !isValid {
-			// http.Error(w, "Invalid credentials", http.StatusUnauthorized)
-			tmplString := "{{.Error}}"
-			tmpl := template.Must(template.New("result").Parse(tmplString))
-			data := map[string]string{
-				"Error": "Invalid credentials",
-			}
-
-			w.WriteHeader(http.StatusUnauthorized)
-			tmpl.ExecuteTemplate(w, "result", data)
-			// json.NewEncoder(w).Encode(map[string]string{
-			// "error": "Invalid credentails",
-			// })
-			return
-		}
-
-		uId, err := uuid.Parse(id)
-		if err != nil {
-			// http.Error(w, err.Error(), http.StatusInternalServerError)
-			fmt.Println(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Internal server error",
-			})
-			return
-		}
-		cId, err := uuid.Parse(company_id)
-		if err != nil {
-			// http.Error(w, err.Error(), http.StatusInternalServerError)
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Internal server error",
-			})
-			return
-		}
-		u := types.User{
-			Id:        uId,
-			Email:     email,
-			Name:      name,
-			CompanyId: cId,
-			RoleId:    role_id,
-		}
-		secretKey := os.Getenv("SECRET")
-		jwtMaker, err := utils.NewJWTMaker(secretKey)
-		if err != nil {
-			// http.Error(w, err.Error(), http.StatusUnauthorized)
-			fmt.Println(err.Error())
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Invalid credentails",
-			})
-			return
-		}
-		token, err := jwtMaker.CreateToken(u, 60*time.Minute)
-		if err != nil {
-			// http.Error(w, err.Error(), http.StatusUnauthorized)
-			fmt.Println(err.Error())
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Invalid credentails",
-			})
-			return
-		}
-		sql = "INSERT INTO logged_in_user (user_id, token) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET token = $2"
-		if _, err := s.db.Exec(sql, u.Id, []byte(token)); err != nil {
-			// http.Error(w, err.Error(), http.StatusInternalServerError)
-			fmt.Println(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Internal Server Error",
-			})
 			return
 		}
 
@@ -235,8 +157,9 @@ func (s *Router) handleLogin(w http.ResponseWriter, r *http.Request) {
 			Secure:   true,
 		}
 		http.SetCookie(w, cookie)
-		w.WriteHeader(http.StatusNoContent)
-		return
+
+		http.Redirect(w, r, "/bca/", http.StatusSeeOther)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
-	w.WriteHeader(http.StatusMethodNotAllowed)
 }
