@@ -33,7 +33,8 @@
                                    <img src="/css/images/edit-outline.svg" alt="edit button" width="15px" />
                               </a>
                               <img src="/css/images/trash-outline.svg" alt="delete button" width="15px"
-                                   class="block mx-2" hx-delete="/bca/usuarios/{{.Id}}" />
+                                   class="block mx-2" hx-delete="/bca/usuarios/{{.Id}}"
+                                   hx-confirm="Está seguro que desea eliminar a usuario con correo {{.Email}}" />
                          </div>
                     </td>
                </tr>
