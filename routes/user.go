@@ -24,10 +24,60 @@ func (p *ProtectedRouter) usersRoutes() {
 
 	u.HandleFunc("/", u.handleUsers)
 	u.HandleFunc("/agregar", u.addUser)
+	u.HandleFunc("/agregar/{userId}", u.updateUser)
 	u.HandleFunc("/{userId}", u.handleSimpleUser)
 }
 
 var retData = make(map[string]interface{})
+
+func (s *usersRouter) updateUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userId, err := uuid.Parse(vars["userId"])
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+	ctxPayload, _ := getMyPaload(r)
+
+	switch r.Method {
+	case http.MethodPost:
+		u := &database.UserInfo{}
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if r.FormValue("email") == "" {
+			u.Email = nil
+		} else {
+			email := r.FormValue("email")
+			u.Email = &email
+		}
+
+		if r.FormValue("name") == "" {
+			u.Name = nil
+		} else {
+			name := r.FormValue("name")
+			u.Name = &name
+		}
+
+		if r.FormValue("role") == "" {
+			u.Role = nil
+		} else {
+			role := r.FormValue("role")
+			u.Role = &role
+		}
+
+		if err := s.db.UpdateUser(u, userId, ctxPayload.CompanyId); err != nil {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
+
+		r.Method = http.MethodGet
+		http.Redirect(w, r, "/bca/usuarios/", http.StatusSeeOther)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
 
 func (s *usersRouter) addUser(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
@@ -135,53 +185,20 @@ func (s *usersRouter) handleSimpleUser(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
 
 	switch r.Method {
-	case http.MethodPut:
-		u := &database.UserInfo{}
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if r.FormValue("email") == "" {
-			u.Email = nil
-		} else {
-			email := r.FormValue("email")
-			u.Email = &email
-		}
-
-		if r.FormValue("name") == "" {
-			u.Name = nil
-		} else {
-			name := r.FormValue("name")
-			u.Name = &name
-		}
-
-		if r.FormValue("role") == "" {
-			u.Role = nil
-		} else {
-			role := r.FormValue("role")
-			u.Role = &role
-		}
-
-		if err := s.db.UpdateUser(u, userId, ctxPayload.CompanyId); err != nil {
-			http.Error(w, err.Error(), http.StatusConflict)
-			return
-		}
-
-		http.Redirect(w, r, "/api/v1/edit-user", http.StatusPermanentRedirect)
 	case http.MethodGet:
+		retData["UserName"] = ctxPayload.Name
+		retData["Title"] = "BCA - Transacciones"
+		retData["Links"] = *utils.Links
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/add-user.html")
+		tmpl, err := template.ParseFiles(file...)
 		user, err := s.db.GetOneUser(userId, ctxPayload.CompanyId)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return
 		}
+		retData["User"] = user
 
-		tmpl, err := template.ParseFiles("templates/bca/users/add-user.html")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusTeapot)
-			return
-		}
-
-		tmpl.Execute(w, user)
+		tmpl.ExecuteTemplate(w, "base", retData)
 	case http.MethodPatch:
 		var oldPassword, newPassword *string
 		if err := r.ParseForm(); err != nil {
