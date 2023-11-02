@@ -20,6 +20,9 @@ The objective of this application is to manage the budget of a construction comp
 ## Table of contents
 
 - [Screens](#screens)
+    - [Login](##login)
+    - [Home](##home)
+    - [Users](##users)
 
 ## Screens
 
