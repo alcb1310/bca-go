@@ -2,9 +2,14 @@
 
 ## Tech Stack
 
-- Go [http://go.dev/](http://go.dev)
-- PostgreSQL [https://www.postgresql.org/](https://www.postgresql.org/)
+- Go [[![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://golang.org/)](http://go.dev)
+- PostgreSQL [[!PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 - HTMX [https://htmx.org/](https://htmx.org/)
+
+## Socials
+
+- [[!Twitter Badge](https://img.shields.io/twitter/follow/username.svg?style=social&label=Follow)](https://twitter.com/alcb1310)
+- [[!Github Badg](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/alcb1310)
 
 ## Description
 
