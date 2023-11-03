@@ -23,10 +23,15 @@ func (d *Database) GetAllProjects(company_id uuid.UUID) ([]types.Project, error)
 
 		projects = append(projects, types.Project{
 			ID:        id,
-			Name:      name,
+			Name:      &name,
 			IsActive:  active,
 			CompanyId: company_id,
 		})
 	}
 	return projects, nil
+}
+func (d *Database) CreateProject(project *types.Project) error {
+	sql := "INSERT INTO project (name, is_active, company_id) VALUES ($1, $2, $3)"
+	_, err := d.Exec(sql, project.Name, project.IsActive, project.CompanyId)
+	return err
 }

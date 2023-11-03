@@ -1,7 +1,7 @@
 {{ define "Content" }}
 
 <section class="m-3">
-     <form method="post" action="{{ if eq .Project nil }} /bca/parametros/projectos/ {{ end }}">
+     <form method="post" action="{{ if eq .Project nil }} /bca/parametros/proyectos/ {{ end }}">
           <div class="flex justify-between items-center">
                <h3 class="text-lg font-semibold">
                     {{ if eq .Project nil }}
@@ -26,6 +26,9 @@
                          value="{{if ne .Project nil}}{{.Project.Name}}{{end}}"
                          class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
                </div>
+               <p id="error" class="text-red-700 text-xs">
+                    {{.Error}}
+               </p>
                <div>
                     <input type="checkbox" id="active" name="active" {{ if eq .Project nil }} checked {{ else }} {{
                          .Project.IsActive }} {{ end }}>
