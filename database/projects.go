@@ -59,3 +59,9 @@ func (d *Database) GetSingleProject(id, company_id uuid.UUID) (*types.Project, e
 	}
 	return project, nil
 }
+
+func (d *Database) UpdateProject(project *types.Project) error {
+	sql := "UPDATE project SET name = $1, is_active = $2 WHERE id = $3 AND company_id = $4"
+	_, err := d.Exec(sql, project.Name, project.IsActive, project.ID, project.CompanyId)
+	return err
+}

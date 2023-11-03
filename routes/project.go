@@ -25,7 +25,7 @@ func (s *settingsRouter) projectsRoutes() {
 
 	p.HandleFunc("/", p.handleProjects)
 	p.HandleFunc("/crear", p.handleCreateProject)
-	p.HandleFunc("/{userId}", p.handleEditProject)
+	p.HandleFunc("/{projectId}", p.handleEditProject)
 }
 
 func (p *proyectRouter) handleEditProject(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +37,7 @@ func (p *proyectRouter) handleEditProject(w http.ResponseWriter, r *http.Request
 	}
 
 	vars := mux.Vars(r)
-	userId, err := uuid.Parse(vars["userId"])
+	projectId, err := uuid.Parse(vars["projectId"])
 	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		return
@@ -46,19 +46,44 @@ func (p *proyectRouter) handleEditProject(w http.ResponseWriter, r *http.Request
 	retData := utils.InitializeMap()
 	retData["UserName"] = ctxPayload.Name
 	retData["Title"] = "BCA - Transacciones"
+	project, err := p.db.GetSingleProject(projectId, ctxPayload.CompanyId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusTeapot)
+		return
+	}
+	if project.Name == nil {
+		http.Error(w, "Proyecto inexistente", http.StatusNotFound)
+		return
+	}
 
 	switch r.Method {
-	case http.MethodGet:
-		project, err := p.db.GetSingleProject(userId, ctxPayload.CompanyId)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusTeapot)
-			return
-		}
-		if project.Name == nil {
-			http.Error(w, "Proyecto inexistente", http.StatusNotFound)
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
+		name := r.FormValue("name")
+		active := r.PostFormValue("active")
+		if name == "" {
+			project.Name = nil
+		} else {
+			project.Name = &name
+		}
+
+		if active == "on" {
+			project.IsActive = true
+		} else {
+			project.IsActive = false
+
+			retData["Error"] = err.Error()
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		}
+
+		r.Method = http.MethodGet
+		http.Redirect(w, r, "/bca/parametros/proyectos/", http.StatusSeeOther)
+	case http.MethodGet:
 		retData["Project"] = project
 		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
