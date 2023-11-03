@@ -1,23 +1,52 @@
 package routes
 
 import (
-	"fmt"
+	"html/template"
 	"net/http"
-	"text/template"
+
+	"github.com/alcb1310/bca-go-w-test/database"
+	"github.com/alcb1310/bca-go-w-test/utils"
+	"github.com/gorilla/mux"
 )
 
-func (p *ProtectedRouter) handleProject(w http.ResponseWriter, r *http.Request) {
+type proyectRouter struct {
+	*mux.Router
+
+	db *database.Database
+}
+
+func (s *settingsRouter) projectsRoutes() {
+	p := &proyectRouter{
+		Router: s.PathPrefix("/proyectos").Subrouter(),
+		db:     s.db,
+	}
+
+	p.HandleFunc("/", p.handleProjects)
+
+}
+
+func (p *proyectRouter) handleProjects(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Transacciones"
+	retData["Links"] = *utils.Links
+
 	switch r.Method {
 	case http.MethodGet:
-		tmpl, err := template.ParseFiles("templates/bca/projects/all-projects.html")
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/projects.html")
+		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
-			fmt.Println(err.Error())
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return
 		}
 
-		tmpl.Execute(w, ctxPayload)
+		retData["Projects"], err = p.db.GetAllProjects(ctxPayload.CompanyId)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
