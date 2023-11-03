@@ -29,6 +29,7 @@ The objective of this application is to manage the budget of a construction comp
     - [Login](#login)
     - [Home](#home)
     - [Users](#users)
+    - [Settings](#settings)
 
 - [Deployment](#deployment)
 
@@ -56,6 +57,13 @@ This option will allow a user with admin privileges to create, update and delete
 
 - `Cambiar contraseña`
 This option will allow any user to change their password to access de application
+
+### Settings
+
+Within the **Parámetros** menu, there will be 3 options
+
+- `Proyectos`
+This option will allow a user to create and update projects, deletion of a project will not be allowed
 
 ## Deployment
 
