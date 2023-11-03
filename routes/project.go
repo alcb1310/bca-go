@@ -80,6 +80,11 @@ func (p *proyectRouter) handleEditProject(w http.ResponseWriter, r *http.Request
 			tmpl.ExecuteTemplate(w, "base", retData)
 			return
 		}
+		if err := p.db.UpdateProject(project); err != nil {
+			retData["Error"] = err.Error()
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		}
 
 		r.Method = http.MethodGet
 		http.Redirect(w, r, "/bca/parametros/proyectos/", http.StatusSeeOther)
