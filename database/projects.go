@@ -35,3 +35,27 @@ func (d *Database) CreateProject(project *types.Project) error {
 	_, err := d.Exec(sql, project.Name, project.IsActive, project.CompanyId)
 	return err
 }
+
+func (d *Database) GetSingleProject(id, company_id uuid.UUID) (*types.Project, error) {
+	sql := "SELECT id, name, is_active  FROM project WHERE id = $1 AND company_id = $2"
+	rows, err := d.Query(sql, id, company_id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	project := &types.Project{}
+	for rows.Next() {
+		var name string
+		var id uuid.UUID
+		var active bool
+		if err := rows.Scan(&id, &name, &active); err != nil {
+			return nil, err
+		}
+
+		project.ID = id
+		project.CompanyId = company_id
+		project.Name = &name
+		project.IsActive = active
+	}
+	return project, nil
+}

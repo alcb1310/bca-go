@@ -7,6 +7,7 @@ import (
 	"github.com/alcb1310/bca-go-w-test/database"
 	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -24,6 +25,45 @@ func (s *settingsRouter) projectsRoutes() {
 
 	p.HandleFunc("/", p.handleProjects)
 	p.HandleFunc("/crear", p.handleCreateProject)
+	p.HandleFunc("/{userId}", p.handleEditProject)
+}
+
+func (p *proyectRouter) handleEditProject(w http.ResponseWriter, r *http.Request) {
+	file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/projects/create-project.html")
+	tmpl, err := template.ParseFiles(file...)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusTeapot)
+		return
+	}
+
+	vars := mux.Vars(r)
+	userId, err := uuid.Parse(vars["userId"])
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+	ctxPayload, _ := getMyPaload(r)
+	retData := utils.InitializeMap()
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Transacciones"
+
+	switch r.Method {
+	case http.MethodGet:
+		project, err := p.db.GetSingleProject(userId, ctxPayload.CompanyId)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+		if project.Name == nil {
+			http.Error(w, "Proyecto inexistente", http.StatusNotFound)
+			return
+		}
+
+		retData["Project"] = project
+		tmpl.ExecuteTemplate(w, "base", retData)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
 
 func (p *proyectRouter) handleCreateProject(w http.ResponseWriter, r *http.Request) {
