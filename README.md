@@ -29,6 +29,8 @@ The objective of this application is to manage the budget of a construction comp
     - [Home](#home)
     - [Users](#users)
 
+- [Deployment](#deployment)
+
 ## Screens
 
 In order to achieve the project's description, the application will have both public and protected Endpoints
@@ -51,5 +53,42 @@ Within the **Usuarios** menu, there will be 2 options
 - `Editar usuario`
 This option will allow a user with admin privileges to create, update and delete users from the application
 
-- `Cambiar contraseaña`
+- `Cambiar contraseña`
 This option will allow any user to change their password to access de application
+
+## Deployment
+
+In order to be able to deploy this application, the following is needed:
+
+1. Clone the repository using the following command
+
+```bash
+git clone https://github.com/alcb1310/bca-go-w-test.git
+```
+
+2. Download all of the project's dependencies by running 
+
+```bash
+go mod tidy
+```
+
+3. At the root of the project directory, create a `.env` file with the following fields:
+
+```.env
+PORT=<Port number where the application will listen>
+
+PGDATABASE=<Name of the postgres database>
+PGHOST=<Host where the postgres database server is running>
+PGPASSWORD=<Password that the postgres server uses>
+PGPORT=<Port where the postgres server is listening>
+PGUSER=<Username of the postgres server>
+
+SECRET=<Secret used to generate the JWT Token>
+```
+
+4. To start the deployed version run the following command
+
+```bash
+go run main.go
+```
+
