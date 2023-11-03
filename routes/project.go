@@ -75,11 +75,8 @@ func (p *proyectRouter) handleEditProject(w http.ResponseWriter, r *http.Request
 			project.IsActive = true
 		} else {
 			project.IsActive = false
-
-			retData["Error"] = err.Error()
-			tmpl.ExecuteTemplate(w, "base", retData)
-			return
 		}
+
 		if err := p.db.UpdateProject(project); err != nil {
 			retData["Error"] = err.Error()
 			tmpl.ExecuteTemplate(w, "base", retData)
