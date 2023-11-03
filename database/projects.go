@@ -1,13 +1,23 @@
 package database
 
 import (
+	"database/sql"
+
 	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/google/uuid"
 )
 
-func (d *Database) GetAllProjects(company_id uuid.UUID) ([]types.Project, error) {
+func (d *Database) GetAllProjects(company_id uuid.UUID, query string) ([]types.Project, error) {
+	var rows *sql.Rows
+	var err error
 	sql := "SELECT id, name, is_active  FROM project WHERE company_id = $1"
-	rows, err := d.Query(sql, company_id)
+	if query == "" {
+		rows, err = d.Query(sql, company_id)
+	} else {
+		sql += " AND name like $2"
+		query = "%" + query + "%"
+		rows, err = d.Query(sql, company_id, query)
+	}
 	if err != nil {
 		return nil, err
 	}

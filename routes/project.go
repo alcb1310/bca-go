@@ -160,6 +160,7 @@ func (p *proyectRouter) handleProjects(w http.ResponseWriter, r *http.Request) {
 		r.Method = http.MethodGet
 		http.Redirect(w, r, "/bca/parametros/proyectos/", http.StatusSeeOther)
 	case http.MethodGet:
+		searchParam := r.URL.Query().Get("proyecto")
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/projects.html")
 		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
@@ -167,7 +168,7 @@ func (p *proyectRouter) handleProjects(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		retData["Projects"], err = p.db.GetAllProjects(ctxPayload.CompanyId)
+		retData["Projects"], err = p.db.GetAllProjects(ctxPayload.CompanyId, searchParam)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
