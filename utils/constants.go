@@ -22,7 +22,7 @@ var Links = &LinksType{
 	Closure:    HTML_PATH_PREFIX + "/transacciones/cierre",
 	Actual:     HTML_PATH_PREFIX + "/reportes/actual",
 	Historic:   HTML_PATH_PREFIX + "/reportes/historico",
-	Supplier:   HTML_PATH_PREFIX + "/parametros/proveedor",
+	Supplier:   HTML_PATH_PREFIX + "/parametros/proveedor/",
 	BudgetItem: HTML_PATH_PREFIX + "/parametros/partidas",
 	Projects:   HTML_PATH_PREFIX + "/parametros/proyectos",
 	EditUser:   HTML_PATH_PREFIX + "/usuarios/",
