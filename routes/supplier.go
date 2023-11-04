@@ -22,6 +22,29 @@ func (r *settingsRouter) supplierRoutes() {
 	}
 
 	s.HandleFunc("/", s.handleSuppliers)
+	s.HandleFunc("/crear", s.createSupplier)
+}
+
+func (s *supplierRouter) createSupplier(w http.ResponseWriter, r *http.Request) {
+	ctxPayload, _ := getMyPaload(r)
+	retData := make(map[string]interface{})
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Parámetros"
+	retData["Links"] = *utils.Links
+
+	switch r.Method {
+	case http.MethodGet:
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/suppliers/create-supplier.html")
+		tmpl, err := template.ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+
+		tmpl.ExecuteTemplate(w, "base", retData)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
 
 func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request) {
@@ -32,8 +55,17 @@ func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request)
 	retData["Links"] = *utils.Links
 
 	switch r.Method {
+	case http.MethodPost:
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/suppliers/create-supplier.html")
+		tmpl, err := template.ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+
+		tmpl.ExecuteTemplate(w, "base", retData)
 	case http.MethodGet:
-		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/suppliers.html")
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/suppliers/suppliers.html")
 		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
