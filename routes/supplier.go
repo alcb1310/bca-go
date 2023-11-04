@@ -26,16 +26,10 @@ func (r *settingsRouter) supplierRoutes() {
 
 func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
-	type Ret struct {
-		UserName string
-		Title    string
-		Links    utils.LinksType
-	}
-	retData := Ret{
-		UserName: ctxPayload.Name,
-		Title:    "BCA - Parámetros",
-		Links:    *utils.Links,
-	}
+	retData := make(map[string]interface{})
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Parámetros"
+	retData["Links"] = *utils.Links
 
 	switch r.Method {
 	case http.MethodGet:
