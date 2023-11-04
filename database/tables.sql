@@ -41,6 +41,17 @@ create table if not exists logged_in_user (
      unique (user_id)
 );
 
+create table if not exists project(
+     id uuid PRIMARY KEY default gen_random_uuid(),
+     name varchar(255) not null,
+     is_active boolean not null default true,
+     created_at timestamp with time zone default now(),
+
+     company_id uuid not null references company(id) on delete restrict,
+
+     unique(company_id, name)
+);
+
 create table if not exists supplier (
      id uuid PRIMARY KEY default gen_random_uuid(),
      name text not null,
