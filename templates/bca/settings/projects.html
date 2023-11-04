@@ -1,7 +1,50 @@
 {{ define "Content" }}
 
-<section class="col-span-10 m-3 text-slate-700">
-     <p>Proyectos</p>
+<section class="m-3">
+     <form method="get" action="/bca/parametros/proyectos/">
+          <div class="flex w-full items-cneter justify-between">
+               <h3 class="text-lg font-semibold">Proyectos</h3>
+               <input type="text" placeholder="Buscar proyecto" name="proyecto"
+                    class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+               <div>
+                    <button
+                         class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-blue-400">Buscar</button>
+                    <a href="/bca/parametros/proyectos/crear"
+                         class="mt-2 bg-green-700 text-gray-50 fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-green-400">Agregar</a>
+               </div>
+          </div>
+     </form>
+
+     <table class="w-full mt-3">
+          <thead class="bg-blue-700 text-gray-50 h-10">
+               <tr>
+                    <th class="w-4/6">Nombre</th>
+                    <th class="w-1/6">Activo</th>
+                    <th class="w-1/6">&nbsp;</th>
+               </tr>
+          </thead>
+          <tbody>
+               {{ if not .Projects}}
+               <tr>
+                    <td colspan="3" class="text-center">No existen proyectos</td>
+               </tr>
+               {{ else }}
+               {{ range .Projects }}
+               <tr class="hover:bg-gray-100">
+                    <td>{{ .Name }}</td>
+                    <td align="center"><img
+                              src="{{ if .IsActive }} /css/images/circle-check-outline.svg {{ else }} /css/images/circle-xmark-outline.svg {{end}}"
+                              alt="is active" width="15px" /></td>
+                    <td align="center">
+                         <a href="/bca/parametros/proyectos/{{.ID}}">
+                              <img src="/css/images/edit-outline.svg" alt="edit button" width="15px" />
+                         </a>
+                    </td>
+               </tr>
+               {{ end }}
+               {{ end }}
+          </tbody>
+     </table>
 </section>
 
 {{ end }}

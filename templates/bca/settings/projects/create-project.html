@@ -1,0 +1,42 @@
+{{ define "Content" }}
+
+<section class="m-3">
+     <form method="post"
+          action="{{ if eq .Project nil }} /bca/parametros/proyectos/ {{else }}/bca/parametros/proyectos/{{.Project.ID}}  {{ end }}">
+          <div class="flex justify-between items-center">
+               <h3 class="text-lg font-semibold">
+                    {{ if eq .Project nil }}
+                    Crear
+                    {{ else }}
+                    Editar
+                    {{ end }}
+                    Proyecto
+               </h3>
+               <div>
+                    <button type="submit"
+                         class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-blue-400">Grabar</button>
+                    <a href="/bca/parametros/proyectos/"
+                         class="mt-2 bg-red-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-red-400">Cancelar</a>
+               </div>
+          </div>
+
+          <div class="flex flex-col">
+               <div>
+                    <label for="name">Nombre</label>
+                    <input type="text" name="name" id="name" placeholder="Nombre" required
+                         value="{{if ne .Project nil}}{{.Project.Name}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+               </div>
+               <p id="error" class="text-red-700 text-xs">
+                    {{.Error}}
+               </p>
+               <div>
+                    <input type="checkbox" id="active" name="active" {{ if eq .Project nil }} checked {{ else }} {{ if
+                         .Project.IsActive }} checked {{end}}{{ end }}>
+                    <label for="active">Activo</label>
+               </div>
+          </div>
+     </form>
+</section>
+
+{{ end }}
