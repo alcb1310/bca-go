@@ -1,7 +1,51 @@
 {{ define "Content" }}
 
 <section class="m-3">
-     <h3>Crear proveedor</h3>
+     <form method="post" action="/bca/parametros/proveedor/">
+          <div class="flex justify-between items-center">
+               <h3 class="text-g font-semibold">{{if eq .Supplier nil }} Crear {{ else }} Editar {{ end }} Proveedor
+               </h3>
+               <div>
+                    <button type="submit"
+                         class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center align-self-end hover:bg-blue-400">Grabar</button>
+
+                    <a href="#"
+                         class="mt-2 bg-red-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center align-self-end hover:bg-red-400">Cancelar</a>
+               </div>
+          </div>
+
+          <div class="flex flex-col">
+               <div>
+                    <label for="ruc">Ruc</label>
+                    <input type="text" name="ruc" id="ruc" placeholder="RUC" required
+                         class="border border-slate-600 w-1/2 px-2 py-2 focus:border-slate-300 rounded lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="name">Nombre</label>
+                    <input type="text" name="name" id="name" placeholder="Nombre" required
+                         class="border border-slate-600 w-1/2 px-2 py-2 focus:border-slate-300 rounded lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="contact_name">Nombre de Contacto</label>
+                    <input type="text" name="contact_name" id="contact_name" placeholder="Nombre Contacto"
+                         class="border border-slate-600 w-1/2 px-2 py-2 focus:border-slate-300 rounded lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="contact_email">Email de Contacto</label>
+                    <input type="text" name="contact_email" id="contact_email" placeholder="Email Contacto"
+                         class="border border-slate-600 w-1/2 px-2 py-2 focus:border-slate-300 rounded lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="contact_phone">Tel&eacute;fono de Contacto</label>
+                    <input type="text" name="contact_phone" id="contact_phone" placeholder="Tel&eacute;fono Contacto"
+                         class="border border-slate-600 w-1/2 px-2 py-2 focus:border-slate-300 rounded lg" />
+               </div>
+          </div>
+     </form>
 </section>
 
 {{ end }}
