@@ -29,8 +29,6 @@ func (p *ProtectedRouter) usersRoutes() {
 	u.HandleFunc("/{userId}", u.handleSimpleUser)
 }
 
-var retData = make(map[string]interface{})
-
 func (s *usersRouter) passwordRoute(w http.ResponseWriter, r *http.Request) {
 	file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/password.html")
 	tmpl, err := template.ParseFiles(file...)
@@ -42,10 +40,12 @@ func (s *usersRouter) passwordRoute(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
 	switch r.Method {
 	case http.MethodGet:
+		retData := utils.InitializeMap()
 		tmpl.ExecuteTemplate(w, "base", retData)
 
 	case http.MethodPost:
 		var oldPassword, newPassword *string
+		retData := utils.InitializeMap()
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -70,7 +70,6 @@ func (s *usersRouter) passwordRoute(w http.ResponseWriter, r *http.Request) {
 			tmpl.ExecuteTemplate(w, "base", retData)
 			return
 		}
-		delete(retData, "Error")
 		r.Method = http.MethodGet
 		http.Redirect(w, r, "/bca/usuarios/contrasena", http.StatusSeeOther)
 
@@ -130,6 +129,7 @@ func (s *usersRouter) updateUser(w http.ResponseWriter, r *http.Request) {
 
 func (s *usersRouter) addUser(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
+	retData := utils.InitializeMap()
 
 	file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/add-user.html")
 	tmpl, err := template.ParseFiles(file...)
@@ -140,11 +140,9 @@ func (s *usersRouter) addUser(w http.ResponseWriter, r *http.Request) {
 
 	retData["UserName"] = ctxPayload.Name
 	retData["Title"] = "BCA - Transacciones"
-	retData["Links"] = *utils.Links
 
 	switch r.Method {
 	case http.MethodGet:
-		delete(retData, "User")
 		w.WriteHeader(http.StatusOK)
 		tmpl.ExecuteTemplate(w, "base", retData)
 	case http.MethodPost:
@@ -200,9 +198,9 @@ func (s *usersRouter) addUser(w http.ResponseWriter, r *http.Request) {
 func (s *usersRouter) handleUsers(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
 
+	retData := utils.InitializeMap()
 	retData["UserName"] = ctxPayload.Name
 	retData["Title"] = "BCA - Transacciones"
-	retData["Links"] = *utils.Links
 	switch r.Method {
 	case http.MethodGet:
 		searchParam := r.URL.Query().Get("usuario")
@@ -234,12 +232,12 @@ func (s *usersRouter) handleSimpleUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctxPayload, _ := getMyPaload(r)
+	retData := utils.InitializeMap()
 
 	switch r.Method {
 	case http.MethodGet:
 		retData["UserName"] = ctxPayload.Name
 		retData["Title"] = "BCA - Transacciones"
-		retData["Links"] = *utils.Links
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/users/add-user.html")
 		tmpl, err := template.ParseFiles(file...)
 		user, err := s.db.GetOneUser(userId, ctxPayload.CompanyId)
