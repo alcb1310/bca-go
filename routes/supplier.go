@@ -7,6 +7,7 @@ import (
 	"github.com/alcb1310/bca-go-w-test/database"
 	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -24,6 +25,38 @@ func (r *settingsRouter) supplierRoutes() {
 
 	s.HandleFunc("/", s.handleSuppliers)
 	s.HandleFunc("/agregar", s.createSupplier)
+	s.HandleFunc("/{supplierId}", s.handleSingleUser)
+}
+
+func (s *supplierRouter) handleSingleUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	supplierId, err := uuid.Parse(vars["supplierId"])
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+	ctxPayload, _ := getMyPaload(r)
+	retData := utils.InitializeMap()
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Parámetros"
+	file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/suppliers/create-supplier.html")
+	tmpl, err := template.ParseFiles(file...)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusTeapot)
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		sup, err := s.db.GetSingleSupplier(supplierId, ctxPayload.CompanyId)
+		if err != nil {
+			retData["Error"] = err.Error()
+		}
+		retData["Supplier"] = sup
+		tmpl.ExecuteTemplate(w, "base", retData)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
 
 func (s *supplierRouter) createSupplier(w http.ResponseWriter, r *http.Request) {
