@@ -25,10 +25,10 @@ func (r *settingsRouter) supplierRoutes() {
 
 	s.HandleFunc("/", s.handleSuppliers)
 	s.HandleFunc("/agregar", s.createSupplier)
-	s.HandleFunc("/{supplierId}", s.handleSingleUser)
+	s.HandleFunc("/{supplierId}", s.handelSingleSupplier)
 }
 
-func (s *supplierRouter) handleSingleUser(w http.ResponseWriter, r *http.Request) {
+func (s *supplierRouter) handelSingleSupplier(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	supplierId, err := uuid.Parse(vars["supplierId"])
 	if err != nil {
@@ -47,6 +47,57 @@ func (s *supplierRouter) handleSingleUser(w http.ResponseWriter, r *http.Request
 	}
 
 	switch r.Method {
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			retData["Error"] = err.Error()
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		}
+		sup := &types.SupplierType{
+			CompanyId: ctxPayload.CompanyId,
+			ID:        supplierId,
+		}
+
+		ruc := r.PostFormValue("ruc")
+		name := r.FormValue("name")
+		contactName := r.FormValue("contact_name")
+		contactEmail := r.FormValue("contact_email")
+		contactPhone := r.FormValue("contact_phone")
+
+		if ruc == "" {
+			sup.Ruc = nil
+		} else {
+			sup.Ruc = &ruc
+		}
+		if name == "" {
+			sup.Name = nil
+		} else {
+			sup.Name = &name
+		}
+		if contactName == "" {
+			sup.ContactName = nil
+		} else {
+			sup.ContactName = &contactName
+		}
+		if contactEmail == "" {
+			sup.ContactEmail = nil
+		} else {
+			sup.ContactEmail = &contactEmail
+		}
+		if contactPhone == "" {
+			sup.ContactPhone = nil
+		} else {
+			sup.ContactPhone = &contactPhone
+		}
+
+		if err := s.db.UpdateSupplier(sup); err != nil {
+			retData["Error"] = err.Error()
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		}
+
+		r.Method = http.MethodGet
+		http.Redirect(w, r, "/bca/parametros/proveedor/", http.StatusSeeOther)
 	case http.MethodGet:
 		sup, err := s.db.GetSingleSupplier(supplierId, ctxPayload.CompanyId)
 		if err != nil {

@@ -14,6 +14,12 @@ func (d *Database) CreateSupplier(s *types.SupplierType) error {
 	return err
 }
 
+func (d *Database) UpdateSupplier(s *types.SupplierType) error {
+	sql := "UPDATE supplier SET name = $1, supplier_id = $2, contact_name = $3, contact_email = $4, contact_phone = $5 WHERE company_id = $6 AND id = $7"
+	_, err := d.Query(sql, s.Name, s.Ruc, s.ContactName, s.ContactEmail, s.ContactPhone, s.CompanyId, s.ID)
+	return err
+}
+
 func (d *Database) GetSingleSupplier(supplierId, companyId uuid.UUID) (*types.SupplierType, error) {
 	sup := &types.SupplierType{}
 	sql := "SELECT id, name, supplier_id, contact_name, contact_email, contact_phone FROM supplier WHERE company_id = $2 AND id = $1"
