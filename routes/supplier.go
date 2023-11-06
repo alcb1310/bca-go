@@ -28,10 +28,9 @@ func (r *settingsRouter) supplierRoutes() {
 
 func (s *supplierRouter) createSupplier(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
-	retData := make(map[string]interface{})
+	retData := utils.InitializeMap()
 	retData["UserName"] = ctxPayload.Name
 	retData["Title"] = "BCA - Parámetros"
-	retData["Links"] = *utils.Links
 
 	switch r.Method {
 	case http.MethodGet:
@@ -50,10 +49,9 @@ func (s *supplierRouter) createSupplier(w http.ResponseWriter, r *http.Request) 
 
 func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
-	retData := make(map[string]interface{})
+	retData := utils.InitializeMap()
 	retData["UserName"] = ctxPayload.Name
 	retData["Title"] = "BCA - Parámetros"
-	retData["Links"] = *utils.Links
 
 	switch r.Method {
 	case http.MethodPost:
