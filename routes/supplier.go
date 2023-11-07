@@ -3,6 +3,7 @@ package routes
 import (
 	"html/template"
 	"net/http"
+	"strconv"
 
 	"github.com/alcb1310/bca-go-w-test/database"
 	"github.com/alcb1310/bca-go-w-test/types"
@@ -204,11 +205,39 @@ func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		retData["Suppliers"], err = s.db.GetAllSuppliers(ctxPayload.CompanyId)
+		pag := &types.PaginationQuery{}
+		strPage := r.URL.Query().Get("pagina")
+		if strPage == "" {
+			pag.Offset = uint(1)
+		} else {
+			page, err := strconv.Atoi(strPage)
+			if err != nil {
+				retData["Error"] = err.Error()
+			} else {
+				pag.Offset = uint(page)
+				// fmt.Println(page)
+			}
+		}
+		strLimit := r.URL.Query().Get("items")
+		if strLimit == "" {
+			pag.Limit = uint(0)
+		} else {
+			limit, err := strconv.Atoi(strLimit)
+			if err != nil {
+				retData["Error"] = err.Error()
+			} else {
+				pag.Limit = uint(limit)
+				// fmt.Println(page)
+			}
+		}
+
+		sup, pagin, err := s.db.GetAllSuppliers(ctxPayload.CompanyId, pag)
 		if err != nil {
 			retData["Error"] = err.Error()
 			// return
 		}
+		retData["Suppliers"] = sup
+		retData["Pagination"] = pagin
 
 		tmpl.ExecuteTemplate(w, "base", retData)
 	default:

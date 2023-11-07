@@ -52,14 +52,20 @@ func (d *Database) GetSingleSupplier(supplierId, companyId uuid.UUID) (*types.Su
 	return sup, nil
 }
 
-func (d *Database) GetAllSuppliers(companyId uuid.UUID) ([]types.SupplierType, error) {
+func (d *Database) GetAllSuppliers(companyId uuid.UUID, pages *types.PaginationQuery) ([]types.SupplierType, *types.PaginationReturn, error) {
 	var rows *sql.Rows
 	var err error
 	sql := "SELECT id, name, supplier_id, contact_name, contact_email, contact_phone FROM supplier WHERE company_id = $1"
 
-	rows, err = d.Query(sql, companyId)
+	if pages != nil && pages.Limit != 0 {
+		sql += " ORDER BY name LIMIT $2 OFFSET $3"
+		rows, err = d.Query(sql, companyId, pages.Limit, (pages.Offset-1)*pages.Limit)
+	} else {
+		rows, err = d.Query(sql, companyId)
+	}
+
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer rows.Close()
 
@@ -69,7 +75,7 @@ func (d *Database) GetAllSuppliers(companyId uuid.UUID) ([]types.SupplierType, e
 		var name, ruc, contactName, contactEmail, contactPhone *string
 
 		if err := rows.Scan(&id, &name, &ruc, &contactName, &contactEmail, &contactPhone); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		suppliers = append(suppliers, types.SupplierType{
@@ -83,5 +89,10 @@ func (d *Database) GetAllSuppliers(companyId uuid.UUID) ([]types.SupplierType, e
 		})
 	}
 
-	return suppliers, nil
+	pag, err := d.getPaginationStruct("select count(*) from supplier where company_id = $1", *pages, companyId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return suppliers, &pag, nil
 }
