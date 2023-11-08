@@ -1,0 +1,14 @@
+{{ define "Pagination" }}
+
+<div class="flex">
+     <a href="{{.URL}}?pagina=1"
+          class="block bg-blue-700 text-gray-50 px-2 py-1 hover:bg-blue-500 rounded-s-md">&lt;&lt;</a>
+     <a href="{{.URL}}?pagina={{.Pagination.Prev}}"
+          class="block bg-blue-700 text-gray-50  px-2 py-1 hover:bg-blue-500">&lt;</a>
+     <a href="{{.URL}}?pagina={{.Pagination.Next}}"
+          class="block bg-blue-700 text-gray-50  px-2 py-1 hover:bg-blue-500">&gt;</a>
+     <a href="{{.URL}}?pagina={{.Pagination.Last}}"
+          class="block bg-blue-700 text-gray-50  px-2 py-1 hover:bg-blue-500 rounded-e-md">&gt;&gt;</a>
+</div>
+
+{{ end }}

@@ -8,6 +8,7 @@ type PaginationQuery struct {
 type PaginationReturn struct {
 	TotalResults uint
 	CurrentPage  uint
-	NextPage     uint
-	TotalPages   uint
+	Next         uint
+	Last         uint
+	Prev         uint
 }

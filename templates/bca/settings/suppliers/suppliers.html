@@ -1,21 +1,27 @@
 {{ define "Content" }}
 
 <section class="m-3">
-     <div class="flex w-full items-center justify-between">
-          <h3 class="text-lg font-semibold">Proveedores</h3>
-          <input type="text" placeholder="Buscar proveedor" name="proveedor"
-               class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate300 rounded-lg">
-          <div>
-               <button
-                    class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center align-self-end hover:bg-blue-400">Buscar</button>
-               <a href="/bca/parametros/proveedor/agregar"
-                    class="mt-2 bg-green-700 text-gray-50 fit px-4 py-2 rounded-full text-center align-self-end hover:bg-green-400">Agregar</a>
+     <form action="/bca/parametros/proveedor/" method="get">
+          <div class="flex w-full items-center justify-between">
+               <h3 class="text-lg font-semibold">Proveedores</h3>
+               <input type="text" placeholder="Buscar proveedor" name="proveedor"
+                    class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate300 rounded-lg">
+               <div>
+                    <button type="submit"
+                         class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center align-self-end hover:bg-blue-400">Buscar</button>
+                    <a href="/bca/parametros/proveedor/agregar"
+                         class="mt-2 bg-green-700 text-gray-50 fit px-4 py-2 rounded-full text-center align-self-end hover:bg-green-400">Agregar</a>
+               </div>
           </div>
-     </div>
+     </form>
 
      <p>
           {{ .Error }}
      </p>
+
+     {{ if .Pagination }}
+     {{ block "Pagination" . }}{{end}}
+     {{ end }}
 
      <table class="w-full mt-3">
           <thead class="bg-blue-700 text-gray-50 h-10">

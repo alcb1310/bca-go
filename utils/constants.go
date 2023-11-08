@@ -30,9 +30,10 @@ var Links = &LinksType{
 }
 
 var (
-	BaseTemplate  string = TEMPLATE_DIR + "base.html"
-	NavTemplate   string = TEMPLATE_DIR + "nav.html"
-	TitleTemplate string = TEMPLATE_DIR + "title.html"
+	BaseTemplate       string = TEMPLATE_DIR + "base.html"
+	NavTemplate        string = TEMPLATE_DIR + "nav.html"
+	TitleTemplate      string = TEMPLATE_DIR + "title.html"
+	PaginationTemplate string = TEMPLATE_DIR + "pagination.html"
 
 	RequiredFiles []string = []string{
 		BaseTemplate,

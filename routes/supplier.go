@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -198,10 +200,11 @@ func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request)
 		http.Redirect(w, r, "/bca/parametros/proveedor/", http.StatusSeeOther)
 	case http.MethodGet:
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/suppliers/suppliers.html")
+		file = append(file, utils.PaginationTemplate)
 		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
-			retData["Error"] = err.Error()
-			tmpl.ExecuteTemplate(w, "base", retData)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Println(fmt.Sprintf("Error parsing template: %s", err.Error()))
 			return
 		}
 
@@ -215,29 +218,27 @@ func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request)
 				retData["Error"] = err.Error()
 			} else {
 				pag.Offset = uint(page)
-				// fmt.Println(page)
 			}
 		}
 		strLimit := r.URL.Query().Get("items")
 		if strLimit == "" {
-			pag.Limit = uint(0)
+			pag.Limit = uint(10)
 		} else {
 			limit, err := strconv.Atoi(strLimit)
 			if err != nil {
 				retData["Error"] = err.Error()
 			} else {
 				pag.Limit = uint(limit)
-				// fmt.Println(page)
 			}
 		}
 
 		sup, pagin, err := s.db.GetAllSuppliers(ctxPayload.CompanyId, pag)
 		if err != nil {
 			retData["Error"] = err.Error()
-			// return
 		}
 		retData["Suppliers"] = sup
 		retData["Pagination"] = pagin
+		retData["URL"] = "/bca/parametros/proveedor/"
 
 		tmpl.ExecuteTemplate(w, "base", retData)
 	default:

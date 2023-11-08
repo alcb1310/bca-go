@@ -30,18 +30,24 @@ func (d *Database) getPaginationStruct(sql string, pagQuery types.PaginationQuer
 		pag.CurrentPage = pagQuery.Offset
 
 		if pagQuery.Limit != 0 {
-			pag.TotalPages = total / pagQuery.Limit
+			pag.Last = total / pagQuery.Limit
 			if (total % pagQuery.Limit) != 0 {
-				pag.TotalPages++
+				pag.Last++
 			}
 		} else {
-			pag.TotalPages = 1
+			pag.Last = 1
 		}
 
-		if pag.CurrentPage < pag.TotalPages {
-			pag.NextPage = pag.CurrentPage + 1
+		if pag.CurrentPage < pag.Last {
+			pag.Next = pag.CurrentPage + 1
 		} else {
-			pag.NextPage = pag.TotalPages
+			pag.Next = pag.Last
+		}
+
+		if pag.CurrentPage > 1 {
+			pag.Prev = pag.CurrentPage - 1
+		} else {
+			pag.Prev = 1
 		}
 	}
 
