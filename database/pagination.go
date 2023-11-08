@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 
@@ -8,12 +9,19 @@ import (
 	"github.com/google/uuid"
 )
 
-func (d *Database) getPaginationStruct(sql string, pagQuery types.PaginationQuery, companyId uuid.UUID) (types.PaginationReturn, error) {
+func (d *Database) getPaginationStruct(sqlQuery string, pagQuery types.PaginationQuery, companyId uuid.UUID, searchParam string) (types.PaginationReturn, error) {
+	var err error
+	var rows *sql.Rows
 	pag := types.PaginationReturn{}
 
-	rows, err := d.Query(sql, companyId)
+	if searchParam == "" {
+		rows, err = d.Query(sqlQuery, companyId)
+	} else {
+		searchParam = "%" + searchParam + "%"
+		rows, err = d.Query(sqlQuery, companyId, searchParam)
+	}
 	if err != nil {
-		log.Println(fmt.Sprintf("Query used: %s", sql))
+		log.Println(fmt.Sprintf("Query used: %s", sqlQuery))
 		log.Println(fmt.Sprintf("Company Id: %s", companyId))
 		log.Println(fmt.Sprintf("Pagination Error: %s", err.Error()))
 		return pag, err
@@ -24,6 +32,8 @@ func (d *Database) getPaginationStruct(sql string, pagQuery types.PaginationQuer
 		var total uint
 
 		if err := rows.Scan(&total); err != nil {
+			log.Println(fmt.Sprintf("Query used: %s", sqlQuery))
+			log.Println(fmt.Sprintf("Error scanning row: %s", err.Error()))
 			return pag, err
 		}
 		pag.TotalResults = total

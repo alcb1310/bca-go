@@ -232,13 +232,19 @@ func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request)
 			}
 		}
 
-		sup, pagin, err := s.db.GetAllSuppliers(ctxPayload.CompanyId, pag)
+		searchParam := r.URL.Query().Get("proveedor")
+
+		sup, pagin, err := s.db.GetAllSuppliers(ctxPayload.CompanyId, pag, searchParam)
 		if err != nil {
 			retData["Error"] = err.Error()
 		}
 		retData["Suppliers"] = sup
 		retData["Pagination"] = pagin
-		retData["URL"] = "/bca/parametros/proveedor/"
+		if searchParam != "" {
+			retData["URL"] = "/bca/parametros/proveedor/" + "?proveedor=" + searchParam + "&"
+		} else {
+			retData["URL"] = "/bca/parametros/proveedor/" + "?"
+		}
 
 		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
