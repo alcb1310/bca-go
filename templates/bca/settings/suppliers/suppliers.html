@@ -19,7 +19,7 @@
           {{ .Error }}
      </p>
 
-     {{ if .Pagination }}
+     {{ if and .Pagination (gt .Pagination.TotalResults 0)}}
      {{ block "Pagination" . }}{{end}}
      {{ end }}
 
