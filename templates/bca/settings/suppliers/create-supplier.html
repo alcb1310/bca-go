@@ -1,0 +1,59 @@
+{{ define "Content" }}
+
+<section class="m-3">
+     <form method="post"
+          action="{{if eq .Supplier nil}} /bca/parametros/proveedor/ {{ else }} /bca/parametros/proveedor/{{.Supplier.ID}} {{ end}}">
+          <div class="flex justify-between items-center">
+               <h3 class="text-g font-semibold">{{if eq .Supplier nil }} Crear {{ else }} Editar {{ end }} Proveedor
+               </h3>
+               <div>
+                    <button type="submit" {{if .Error }} disabled {{end}}
+                         class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center align-self-end hover:bg-blue-400">Grabar</button>
+
+                    <a href="/bca/parametros/proveedor/"
+                         class="mt-2 bg-red-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center align-self-end hover:bg-red-400">Cancelar</a>
+               </div>
+          </div>
+
+          <p class="text-sm text-red-700">{{.Error}}</p>
+          <input type="hidden" name="referer" value="{{.Referer}}">
+          <div class="flex flex-col">
+               <div>
+                    <label for="ruc">Ruc</label>
+                    <input type="text" name="ruc" id="ruc" placeholder="RUC" required
+                         value="{{ if .Supplier }}{{.Supplier.Ruc}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-2 focus:border-slate-300 rounded lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="name">Nombre</label>
+                    <input type="text" name="name" id="name" placeholder="Nombre" required
+                         value="{{ if .Supplier }}{{.Supplier.Name}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-2 focus:border-slate-300 rounded lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="contact_name">Nombre de Contacto</label>
+                    <input type="text" name="contact_name" id="contact_name" placeholder="Nombre Contacto"
+                         value="{{ if .Supplier}}{{ if .Supplier.ContactName }}{{.Supplier.ContactName}}{{end}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-2 focus:border-slate-300 rounded lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="contact_email">Email de Contacto</label>
+                    <input type="text" name="contact_email" id="contact_email" placeholder="Email Contacto"
+                         value="{{ if .Supplier}}{{ if .Supplier.ContactEmail }}{{.Supplier.ContactEmail}}{{end}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-2 focus:border-slate-300 rounded lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="contact_phone">Tel&eacute;fono de Contacto</label>
+                    <input type="text" name="contact_phone" id="contact_phone" placeholder="Tel&eacute;fono Contacto"
+                         value="{{ if .Supplier}}{{ if .Supplier.ContactPhone }}{{.Supplier.ContactPhone}}{{end}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-2 focus:border-slate-300 rounded lg" />
+               </div>
+          </div>
+     </form>
+</section>
+
+{{ end }}

@@ -65,6 +65,9 @@ Within the **Parámetros** menu, there will be 3 options
 - `Proyectos`
 This option will allow a user to create and update projects, deletion of a project will not be allowed
 
+- `Proveedores`
+This option will allow a user to create and update suppliers, deletion of a supplier will not be allowed
+
 ## Deployment
 
 In order to be able to deploy this application, the following is needed:
