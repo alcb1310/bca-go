@@ -66,6 +66,7 @@ func (s *supplierRouter) handelSingleSupplier(w http.ResponseWriter, r *http.Req
 		contactName := r.FormValue("contact_name")
 		contactEmail := r.FormValue("contact_email")
 		contactPhone := r.FormValue("contact_phone")
+		referer := r.FormValue("referer")
 
 		if ruc == "" {
 			sup.Ruc = nil
@@ -100,8 +101,11 @@ func (s *supplierRouter) handelSingleSupplier(w http.ResponseWriter, r *http.Req
 		}
 
 		r.Method = http.MethodGet
-		http.Redirect(w, r, "/bca/parametros/proveedor/", http.StatusSeeOther)
+		http.Redirect(w, r, referer, http.StatusSeeOther)
 	case http.MethodGet:
+		referer := r.Header.Get("Referer")
+		fmt.Println("Referer: ", referer)
+		retData["Referer"] = referer
 		sup, err := s.db.GetSingleSupplier(supplierId, ctxPayload.CompanyId)
 		if err != nil {
 			retData["Error"] = err.Error()
@@ -118,6 +122,8 @@ func (s *supplierRouter) createSupplier(w http.ResponseWriter, r *http.Request) 
 	retData := utils.InitializeMap()
 	retData["UserName"] = ctxPayload.Name
 	retData["Title"] = "BCA - Parámetros"
+	referer := r.Header.Get("Referer")
+	retData["Referer"] = referer
 
 	switch r.Method {
 	case http.MethodGet:
@@ -163,6 +169,7 @@ func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request)
 		contactName := r.FormValue("contact_name")
 		contactEmail := r.FormValue("contact_email")
 		contactPhone := r.FormValue("contact_phone")
+		referer := r.FormValue("referer")
 
 		if ruc == "" {
 			sup.Ruc = nil
@@ -197,7 +204,7 @@ func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request)
 		}
 
 		r.Method = http.MethodGet
-		http.Redirect(w, r, "/bca/parametros/proveedor/", http.StatusSeeOther)
+		http.Redirect(w, r, referer, http.StatusSeeOther)
 	case http.MethodGet:
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/suppliers/suppliers.html")
 		file = append(file, utils.PaginationTemplate)
