@@ -66,6 +66,21 @@ create table if not exists supplier (
      unique(supplier_id, company_id)
 );
 
+create table if not exists budget_item (
+     id uuid PRIMARY KEY default gen_random_uuid(),
+     code text not null,
+     name varchar(255) not null,
+     accumulates boolean not null default true,
+     level integer not null,
+     created_at timestamp with time zone default now(),
+
+     parent_id uuid references budget_item(id) on delete restrict,
+     company_id uuid not null references company(id) on delete restrict,
+
+     unique(code, company_id),
+     unique(name, company_id)
+);
+
 --  REQUIRED VIEWS
 
 create or replace view user_without_password as
