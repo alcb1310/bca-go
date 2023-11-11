@@ -52,6 +52,20 @@ create table if not exists project(
      unique(company_id, name)
 );
 
+create table if not exists supplier (
+     id uuid PRIMARY KEY default gen_random_uuid(),
+     name text not null,
+     supplier_id text not null,
+     contact_name text,
+     contact_email text,
+     contact_phone text,
+     created_at timestamp with time zone  default now(),
+
+     company_id uuid not null references company(id) on delete restrict,
+     unique(name, company_id),
+     unique(supplier_id, company_id)
+);
+
 --  REQUIRED VIEWS
 
 create or replace view user_without_password as

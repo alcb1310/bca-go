@@ -1,0 +1,66 @@
+{{ define "Content" }}
+
+<section class="m-3">
+     <form action="/bca/parametros/proveedor/" method="get">
+          <div class="flex w-full items-center justify-between">
+               <h3 class="text-lg font-semibold">Proveedores</h3>
+               <input type="text" placeholder="Buscar proveedor" name="proveedor"
+                    class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate300 rounded-lg">
+               <div>
+                    <button type="submit"
+                         class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center align-self-end hover:bg-blue-400">Buscar</button>
+                    <a href="/bca/parametros/proveedor/agregar"
+                         class="mt-2 bg-green-700 text-gray-50 fit px-4 py-2 rounded-full text-center align-self-end hover:bg-green-400">Agregar</a>
+               </div>
+          </div>
+     </form>
+
+     <p>
+          {{ .Error }}
+     </p>
+
+     {{ if and .Pagination (gt .Pagination.TotalResults 0)}}
+     {{ block "Pagination" . }}{{end}}
+     {{ end }}
+
+     <table class="w-full mt-3">
+          <thead class="bg-blue-700 text-gray-50 h-10">
+               <tr>
+                    <td rowspan="2" align="center" class="w-1/6">Ruc</td>
+                    <td rowspan="2" align="center">Nombre</td>
+                    <td colspan="3" align="center">Contacto</td>
+                    <td rowspan="2" align="center" class="w-1/8">&nbsp;</td>
+               </tr>
+               <tr>
+                    <td align="center" class="w-1/6">Nombre</td>
+                    <td align="center" class="w-1/6">E-mail</td>
+                    <td align="center" class="w-1/6">Tel&eacute;fono</td>
+               </tr>
+          </thead>
+          <tbody>
+               {{ if not .Suppliers }}
+               <tr>
+                    <td colspan="5" align="center">No existen proveedores</td>
+               </tr>
+               {{ else }}
+               {{ range .Suppliers }}
+               <tr class="hover:bg-gray-100">
+                    <td>{{ .Ruc}}</td>
+                    <td>{{ .Name}}</td>
+                    <td>{{ if .ContactName}} {{.ContactName}} {{end }}</td>
+                    <td>{{ if .ContactEmail}}{{ .ContactEmail}} {{end }}</td>
+                    <td>{{ if .ContactPhone}}{{ .ContactPhone}} {{end }}</td>
+                    <td>
+                         <a href="/bca/parametros/proveedor/{{.ID}}">
+                              <img src="/css/images/edit-outline.svg" alt="edit button" width="15px" />
+                         </a>
+                    </td>
+               </tr>
+
+               {{ end }}
+               {{ end }}
+          </tbody>
+     </table>
+</section>
+
+{{ end }}

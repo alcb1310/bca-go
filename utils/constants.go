@@ -22,7 +22,7 @@ var Links = &LinksType{
 	Closure:    HTML_PATH_PREFIX + "/transacciones/cierre",
 	Actual:     HTML_PATH_PREFIX + "/reportes/actual",
 	Historic:   HTML_PATH_PREFIX + "/reportes/historico",
-	Supplier:   HTML_PATH_PREFIX + "/parametros/proveedor",
+	Supplier:   HTML_PATH_PREFIX + "/parametros/proveedor/",
 	BudgetItem: HTML_PATH_PREFIX + "/parametros/partidas",
 	Projects:   HTML_PATH_PREFIX + "/parametros/proyectos/",
 	EditUser:   HTML_PATH_PREFIX + "/usuarios/",
@@ -30,9 +30,10 @@ var Links = &LinksType{
 }
 
 var (
-	BaseTemplate  string = TEMPLATE_DIR + "base.html"
-	NavTemplate   string = TEMPLATE_DIR + "nav.html"
-	TitleTemplate string = TEMPLATE_DIR + "title.html"
+	BaseTemplate       string = TEMPLATE_DIR + "base.html"
+	NavTemplate        string = TEMPLATE_DIR + "nav.html"
+	TitleTemplate      string = TEMPLATE_DIR + "title.html"
+	PaginationTemplate string = TEMPLATE_DIR + "pagination.html"
 
 	RequiredFiles []string = []string{
 		BaseTemplate,
