@@ -206,7 +206,7 @@ func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request)
 		r.Method = http.MethodGet
 		http.Redirect(w, r, referer, http.StatusSeeOther)
 	case http.MethodGet:
-		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/suppliers/suppliers.html")
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/suppliers/index.html")
 		file = append(file, utils.PaginationTemplate)
 		tmpl, err := template.ParseFiles(file...)
 		if err != nil {

@@ -38,7 +38,7 @@ func (b *budgetItemRouter) handleBudgetItems(w http.ResponseWriter, r *http.Requ
 
 	switch r.Method {
 	case http.MethodGet:
-		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/budget-items.html")
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/budget-items/index.html")
 		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
