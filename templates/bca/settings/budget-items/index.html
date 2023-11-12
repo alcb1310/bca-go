@@ -1,7 +1,37 @@
 {{ define "Content" }}
 
-<section class="col-span-10 m-3 text-slate-700">
-     <p>Partidas</p>
+<section class="m-3">
+     <div class="flex w-full items-center justify-between">
+          <h3 class="text-lg font-semibold">Partidas</h3>
+          <input type="text" placeholder="Buscar partida" name="partida"
+               class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate300 rounded-lg" />
+          <div>
+               <button
+                    class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-blue-400">Buscar</button></button>
+               <a href="/bca/parametros/partidas/agregar"
+                    class="mt-2 bg-green-700 text-gray-50 fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-green-400">Agregar</a>
+          </div>
+     </div>
+
+     <table class="w-full mt-3">
+          <thead class="bg-blue-700 text-gray-50 h-10">
+               <tr>
+                    <th class="w-1/6">C&oacute;digo</th>
+                    <th class="w-2/6">Nombre</th>
+                    <th class="w-1/6">Acumula</th>
+                    <th class="w-1/6">Nivel</th>
+                    <th class="w-1/6">Padre</th>
+                    <th class="w-1/8">&nbsp;</th>
+               </tr>
+          </thead>
+          <tbody>
+               {{ if not .BudgetItems}}
+               <tr>
+                    <td colspan="6" class="text-center">No existen partidas</td>
+               </tr>
+               {{end}}
+          </tbody>
+     </table>
 </section>
 
 {{ end }}

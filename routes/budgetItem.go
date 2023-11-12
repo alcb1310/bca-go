@@ -25,16 +25,9 @@ func (s *settingsRouter) budgetItemsRoutes() {
 
 func (b *budgetItemRouter) handleBudgetItems(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
-	type Ret struct {
-		UserName string
-		Title    string
-		Links    utils.LinksType
-	}
-	retData := Ret{
-		UserName: ctxPayload.Name,
-		Title:    "BCA - Parámetros",
-		Links:    *utils.Links,
-	}
+	retData := utils.InitializeMap()
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Parámetros"
 
 	switch r.Method {
 	case http.MethodGet:
@@ -44,6 +37,12 @@ func (b *budgetItemRouter) handleBudgetItems(w http.ResponseWriter, r *http.Requ
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return
 		}
+
+		budgetItems, err := b.db.GetAllBudgetItems(ctxPayload.CompanyId)
+		if err != nil {
+			return
+		}
+		retData["BudgetItems"] = budgetItems
 
 		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
