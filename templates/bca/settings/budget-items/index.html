@@ -29,6 +29,18 @@
                <tr>
                     <td colspan="6" class="text-center">No existen partidas</td>
                </tr>
+               {{ else }}
+               {{ range .BudgetItems }}
+               <tr>
+                    <td>{{.Code}}</td>
+                    <td>{{.Name}}</td>
+                    <td align="center"><img
+                              src="{{ if .Accumulates }} /css/images/circle-check-outline.svg {{ else }} /css/images/circle-xmark-outline.svg {{end}}"
+                              alt="is active" width="15px" /></td>
+                    <td align="center">{{.Level}}</td>
+                    <td alogn="center">{{.ParentId }}</td>
+               </tr>
+               {{ end }}
                {{end}}
           </tbody>
      </table>

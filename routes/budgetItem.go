@@ -65,10 +65,10 @@ func (b *budgetItemRouter) handleBudgetItems(w http.ResponseWriter, r *http.Requ
 		} else {
 			budgetItem.Accumulates = false
 		}
-		if r.FormValue("parentId") == "" {
+		if r.FormValue("parent") == "" {
 			budgetItem.ParentId = nil
 		} else {
-			parentId, _ := uuid.Parse(r.FormValue("parentId"))
+			parentId, _ := uuid.Parse(r.FormValue("parent"))
 			budgetItem.ParentId = &parentId
 		}
 

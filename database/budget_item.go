@@ -16,27 +16,23 @@ func (d *Database) GetAllBudgetItems(companyId uuid.UUID) ([]types.BudgetItemTyp
 	defer rows.Close()
 	var items []types.BudgetItemType
 	for rows.Next() {
-		var id, parentId uuid.UUID
+		var id, parentId *uuid.UUID
 		var code, name, accumulates, level *string
 		if err := rows.Scan(&id, &code, &name, &accumulates, &level, &parentId); err != nil {
 			return nil, err
 		}
 
-		var accBool bool
-		if *accumulates == "f" {
-			accBool = false
-		} else {
-			accBool = true
-		}
+		accBool := *accumulates == "t"
 		levelInt, _ := strconv.Atoi(*level)
+		levelUint := uint(levelInt)
 
 		items = append(items, types.BudgetItemType{
-			ID:          id,
+			ID:          *id,
 			Code:        code,
 			Name:        name,
 			Accumulates: accBool,
-			Level:       uint(levelInt),
-			ParentId:    &parentId,
+			Level:       &levelUint,
+			ParentId:    parentId,
 		})
 	}
 
@@ -67,6 +63,7 @@ func (d *Database) AllBudgetItemsByAccumulates(companyId uuid.UUID, accumulates 
 
 	return items, nil
 }
+
 func (d *Database) CreateBudgetItem(companyId uuid.UUID, budgetItem *types.BudgetItemType) error {
 	sql := "INSERT INTO budget_item (company_id, code, name, accumulates, level, parent_id) VALUES ($1, $2, $3, $4, $5, $6)"
 	_, err := d.Exec(sql, companyId, budgetItem.Code, budgetItem.Name, budgetItem.Accumulates, budgetItem.Level, budgetItem.ParentId)

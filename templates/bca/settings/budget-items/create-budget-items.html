@@ -42,6 +42,7 @@
                          class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
                </div>
 
+               {{ .BugetItemList }}
                <div class="mt-4">
                     <label for="parent">Padre</label>
                     <select name="parent" id="parent"
@@ -49,7 +50,7 @@
                          <option value="" {{if or (eq .BudgetItem nil) (eq .BudgetItem.Parent nil)}} selected {{end}}>
                               Ninguno</option>
                          {{ range .BudgetItemList}}
-                         <option value="{{.ID}}" {{ if eq .BudgetItem.Parent.ID .ID }} selected {{end}}>
+                         <option value="{{.ID}}">
                               {{.Name}}
                          </option>
                          {{end}}
