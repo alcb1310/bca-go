@@ -8,7 +8,7 @@ import (
 )
 
 func (d *Database) GetAllBudgetItems(companyId uuid.UUID) ([]types.BudgetItemType, error) {
-	sql := "SELECT id, code, name, accumulates, level, parent_id FROM budget_item WHERE company_id = $1"
+	sql := "SELECT id, code, name, accumulates, level, parent_id, parent_code FROM budget_item_with_parents WHERE company_id = $1"
 	rows, err := d.Query(sql, companyId)
 	if err != nil {
 		return nil, err
@@ -16,13 +16,13 @@ func (d *Database) GetAllBudgetItems(companyId uuid.UUID) ([]types.BudgetItemTyp
 	defer rows.Close()
 	var items []types.BudgetItemType
 	for rows.Next() {
-		var id, parentId *uuid.UUID
-		var code, name, accumulates, level *string
-		if err := rows.Scan(&id, &code, &name, &accumulates, &level, &parentId); err != nil {
+		var id, parent_id *uuid.UUID
+		var code, name, accumulates, level, parent_code *string
+		if err := rows.Scan(&id, &code, &name, &accumulates, &level, &parent_id, &parent_code); err != nil {
 			return nil, err
 		}
 
-		accBool := *accumulates == "t"
+		accBool := *accumulates == "true"
 		levelInt, _ := strconv.Atoi(*level)
 		levelUint := uint(levelInt)
 
@@ -32,7 +32,8 @@ func (d *Database) GetAllBudgetItems(companyId uuid.UUID) ([]types.BudgetItemTyp
 			Name:        name,
 			Accumulates: accBool,
 			Level:       &levelUint,
-			ParentId:    parentId,
+			ParentId:    parent_id,
+			ParentCode:  parent_code,
 		})
 	}
 

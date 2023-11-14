@@ -89,3 +89,10 @@ u.email user_email, u.name user_name, r.name role_name, r.id role_id
 from "user" u
 inner join role r on u.role_id = r.id
 inner join company c on u.company_id = c.id;
+
+create or replace view budget_item_with_parents as
+select b.id id, b.code code, b.name name, b.accumulates accumulates, b.level level, p.code parent_code,
+p.name parent_name, p.id parent_id, b.company_id company_id
+from budget_item b
+left outer join budget_item p on b.parent_id = p.id;
+

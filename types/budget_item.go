@@ -9,4 +9,5 @@ type BudgetItemType struct {
 	Accumulates bool
 	Level       *uint
 	ParentId    *uuid.UUID
+	ParentCode  *string
 }

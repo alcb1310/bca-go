@@ -38,7 +38,7 @@
                               src="{{ if .Accumulates }} /css/images/circle-check-outline.svg {{ else }} /css/images/circle-xmark-outline.svg {{end}}"
                               alt="is active" width="15px" /></td>
                     <td align="center">{{.Level}}</td>
-                    <td alogn="center">{{.ParentId }}</td>
+                    <td align="center">{{if ne .ParentCode nil }}{{.ParentCode}}{{end}}</td>
                </tr>
                {{ end }}
                {{end}}
