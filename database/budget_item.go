@@ -42,3 +42,28 @@ func (d *Database) GetAllBudgetItems(companyId uuid.UUID) ([]types.BudgetItemTyp
 
 	return items, nil
 }
+
+func (d *Database) AllBudgetItemsByAccumulates(companyId uuid.UUID, accumulates bool) ([]types.BudgetItemType, error) {
+	sql := "SELECT id, code, name  FROM budget_item WHERE company_id = $1 AND accumulates = $2 ORDER BY code"
+	rows, err := d.Query(sql, companyId, accumulates)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []types.BudgetItemType
+	for rows.Next() {
+		var id uuid.UUID
+		var code, name *string
+		if err := rows.Scan(&id, &code, &name); err != nil {
+			return nil, err
+		}
+
+		items = append(items, types.BudgetItemType{
+			ID:   id,
+			Code: code,
+			Name: name,
+		})
+	}
+
+	return items, nil
+}

@@ -1,0 +1,68 @@
+{{ define "Content" }}
+
+<section class="m-3">
+     <form method="post"
+          action="{{ if eq .BudgetItem nil }} /bca/parametros/partidas/ {{else }}/bca/parametros/partidas/{{.BudgetItem.ID}}  {{ end }}">
+          <div class="flex justify-between items-center">
+               <h3 class="text-lg font-semibold">
+                    {{ if eq .BudgetItem nil }}
+                    Crear
+                    {{ else }}
+                    Editar
+                    {{ end }}
+                    Partidas
+               </h3>
+               <div>
+                    <button type="submit"
+                         class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-blue-400">Grabar</button></button>
+                    <a href="/bca/parametros/partidas/"
+                         class="mt-2 bg-red-700 text-gray-50 fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-red-400">Cancelar</a>
+               </div>
+          </div>
+
+          <div class="flex flex-col">
+               <div>
+                    <label for="code">C&oacute;digo</label>
+                    <input type="text" name="code" id="code" placeholder="C&oacute;digo" required
+                         value="{{if ne .BudgetItem nil}}{{.BudgetItem.Code}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="name">Nombre</label>
+                    <input type="text" name="name" id="name" placeholder="Nombre" required
+                         value="{{if ne .BudgetItem nil}}{{.BudgetItem.Name}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="level">Level</label>
+                    <input type="number" name="level" id="level" placeholder="Nivel" required
+                         value="{{if ne .BudgetItem nil}}{{.BudgetItem.Level}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="parent">Padre</label>
+                    <select name="parent" id="parent"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg">
+                         <option value="" {{if or (eq .BudgetItem nil) (eq .BudgetItem.Parent nil)}} selected {{end}}>
+                              Ninguno</option>
+                         {{ range .BudgetItems}}
+                         <option value="{{.ID}}" {{ if eq .BudgetItem.Parent.ID .ID }} selected {{end}}>
+                              {{.Name}}
+                         </option>
+                         {{end}}
+                    </select>
+               </div>
+
+               <div class="mt-4">
+                    <input type="checkbox" id="accumulate" name="accumulate" {{ if eq .Project nil }} checked {{ else }}
+                         {{ if .Project.Accumulate }} checked {{end}}{{ end }}>
+                    <label for="accumulate">Activo</label>
+               </div>
+          </div>
+     </form>
+</section>
+
+{{ end }}
