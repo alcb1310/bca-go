@@ -67,3 +67,8 @@ func (d *Database) AllBudgetItemsByAccumulates(companyId uuid.UUID, accumulates 
 
 	return items, nil
 }
+func (d *Database) CreateBudgetItem(companyId uuid.UUID, budgetItem *types.BudgetItemType) error {
+	sql := "INSERT INTO budget_item (company_id, code, name, accumulates, level, parent_id) VALUES ($1, $2, $3, $4, $5, $6)"
+	_, err := d.Exec(sql, companyId, budgetItem.Code, budgetItem.Name, budgetItem.Accumulates, budgetItem.Level, budgetItem.ParentId)
+	return err
+}
