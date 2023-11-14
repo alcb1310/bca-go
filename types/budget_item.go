@@ -7,6 +7,6 @@ type BudgetItemType struct {
 	Code        *string
 	Name        *string
 	Accumulates bool
-	Level       uint
+	Level       *uint
 	ParentId    *uuid.UUID
 }

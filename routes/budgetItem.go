@@ -3,9 +3,12 @@ package routes
 import (
 	"html/template"
 	"net/http"
+	"strconv"
 
 	"github.com/alcb1310/bca-go-w-test/database"
+	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -31,6 +34,51 @@ func (b *budgetItemRouter) handleBudgetItems(w http.ResponseWriter, r *http.Requ
 	retData["Title"] = "BCA - Parámetros"
 
 	switch r.Method {
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		budgetItem := &types.BudgetItemType{}
+		code := r.FormValue("code")
+		if code == "" {
+			budgetItem.Code = nil
+		} else {
+			budgetItem.Code = &code
+		}
+		name := r.FormValue("name")
+		if name == "" {
+			budgetItem.Name = nil
+		} else {
+			budgetItem.Name = &name
+		}
+		level := r.FormValue("level")
+		if level == "" {
+			budgetItem.Level = nil
+		} else {
+			levelInt, _ := strconv.Atoi(level)
+			levelUint := uint(levelInt)
+			budgetItem.Level = &levelUint
+		}
+		if r.FormValue("accumulate") == "on" {
+			budgetItem.Accumulates = true
+		} else {
+			budgetItem.Accumulates = false
+		}
+		if r.FormValue("parentId") == "" {
+			budgetItem.ParentId = nil
+		} else {
+			parentId, _ := uuid.Parse(r.FormValue("parentId"))
+			budgetItem.ParentId = &parentId
+		}
+
+		if err := b.db.CreateBudgetItem(ctxPayload.CompanyId, budgetItem); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		r.Method = http.MethodGet
+		http.Redirect(w, r, "/bca/parametros/partidas/", http.StatusSeeOther)
 	case http.MethodGet:
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/budget-items/index.html")
 		tmpl, err := template.ParseFiles(file...)

@@ -48,7 +48,7 @@
                          class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg">
                          <option value="" {{if or (eq .BudgetItem nil) (eq .BudgetItem.Parent nil)}} selected {{end}}>
                               Ninguno</option>
-                         {{ range .BudgetItems}}
+                         {{ range .BudgetItemList}}
                          <option value="{{.ID}}" {{ if eq .BudgetItem.Parent.ID .ID }} selected {{end}}>
                               {{.Name}}
                          </option>
@@ -59,7 +59,7 @@
                <div class="mt-4">
                     <input type="checkbox" id="accumulate" name="accumulate" {{ if eq .Project nil }} checked {{ else }}
                          {{ if .Project.Accumulate }} checked {{end}}{{ end }}>
-                    <label for="accumulate">Activo</label>
+                    <label for="accumulate">Acumula</label>
                </div>
           </div>
      </form>
