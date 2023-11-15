@@ -12,14 +12,26 @@ func (d *Database) GetAllBudgetItems(companyId uuid.UUID, pages *types.Paginatio
 	var rows *sql.Rows
 	var err error
 	sqlQuery := "SELECT id, code, name, accumulates, level, parent_id, parent_code FROM budget_item_with_parents WHERE company_id = $1"
-	sqlQuery += " ORDER BY code"
 
-	if pages != nil {
-		sqlQuery += " LIMIT $2"
-		sqlQuery += " OFFSET $3"
-		rows, err = d.Query(sqlQuery, companyId, pages.Limit, (pages.Offset-1)*pages.Limit)
+	if searchParam != "" {
+		sqlQuery += " AND name ILIKE $2"
+		sqlQuery += " ORDER BY code"
+		if pages != nil && pages.Limit != 0 {
+			sqlQuery += " LIMIT $3"
+			sqlQuery += " OFFSET $4"
+			rows, err = d.Query(sqlQuery, companyId, "%"+searchParam+"%", pages.Limit, (pages.Offset-1)*pages.Limit)
+		} else {
+			rows, err = d.Query(sqlQuery, companyId, "%"+searchParam+"%")
+		}
 	} else {
-		rows, err = d.Query(sqlQuery, companyId)
+		sqlQuery += " ORDER BY code"
+		if pages != nil {
+			sqlQuery += " LIMIT $2"
+			sqlQuery += " OFFSET $3"
+			rows, err = d.Query(sqlQuery, companyId, pages.Limit, (pages.Offset-1)*pages.Limit)
+		} else {
+			rows, err = d.Query(sqlQuery, companyId)
+		}
 	}
 
 	if err != nil {
@@ -50,6 +62,9 @@ func (d *Database) GetAllBudgetItems(companyId uuid.UUID, pages *types.Paginatio
 	}
 
 	sqlQuery = "SELECT count(*) FROM budget_item_with_parents WHERE company_id = $1"
+	if searchParam != "" {
+		sqlQuery += " AND name LIKE $2"
+	}
 
 	pag, err := d.getPaginationStruct(sqlQuery, *pages, companyId, searchParam)
 	if err != nil {
