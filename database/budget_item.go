@@ -1,17 +1,29 @@
 package database
 
 import (
+	"database/sql"
 	"strconv"
 
 	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/google/uuid"
 )
 
-func (d *Database) GetAllBudgetItems(companyId uuid.UUID) ([]types.BudgetItemType, error) {
-	sql := "SELECT id, code, name, accumulates, level, parent_id, parent_code FROM budget_item_with_parents WHERE company_id = $1"
-	rows, err := d.Query(sql, companyId)
+func (d *Database) GetAllBudgetItems(companyId uuid.UUID, pages *types.PaginationQuery, searchParam string) ([]types.BudgetItemType, *types.PaginationReturn, error) {
+	var rows *sql.Rows
+	var err error
+	sqlQuery := "SELECT id, code, name, accumulates, level, parent_id, parent_code FROM budget_item_with_parents WHERE company_id = $1"
+	sqlQuery += " ORDER BY code"
+
+	if pages != nil {
+		sqlQuery += " LIMIT $2"
+		sqlQuery += " OFFSET $3"
+		rows, err = d.Query(sqlQuery, companyId, pages.Limit, (pages.Offset-1)*pages.Limit)
+	} else {
+		rows, err = d.Query(sqlQuery, companyId)
+	}
+
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer rows.Close()
 	var items []types.BudgetItemType
@@ -19,7 +31,7 @@ func (d *Database) GetAllBudgetItems(companyId uuid.UUID) ([]types.BudgetItemTyp
 		var id, parent_id *uuid.UUID
 		var code, name, accumulates, level, parent_code *string
 		if err := rows.Scan(&id, &code, &name, &accumulates, &level, &parent_id, &parent_code); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		accBool := *accumulates == "true"
@@ -37,7 +49,14 @@ func (d *Database) GetAllBudgetItems(companyId uuid.UUID) ([]types.BudgetItemTyp
 		})
 	}
 
-	return items, nil
+	sqlQuery = "SELECT count(*) FROM budget_item_with_parents WHERE company_id = $1"
+
+	pag, err := d.getPaginationStruct(sqlQuery, *pages, companyId, searchParam)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return items, &pag, nil
 }
 
 func (d *Database) AllBudgetItemsByAccumulates(companyId uuid.UUID, accumulates bool) ([]types.BudgetItemType, error) {

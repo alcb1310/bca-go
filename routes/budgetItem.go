@@ -81,17 +81,49 @@ func (b *budgetItemRouter) handleBudgetItems(w http.ResponseWriter, r *http.Requ
 		http.Redirect(w, r, "/bca/parametros/partidas/", http.StatusSeeOther)
 	case http.MethodGet:
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/budget-items/index.html")
+		file = append(file, utils.PaginationTemplate)
 		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusTeapot)
-			return
+			retData["Error"] = err.Error()
 		}
 
-		budgetItems, err := b.db.GetAllBudgetItems(ctxPayload.CompanyId)
+		pag := &types.PaginationQuery{}
+		strPage := r.URL.Query().Get("pagina")
+		if strPage == "" {
+			pag.Offset = uint(1)
+		} else {
+			page, err := strconv.Atoi(strPage)
+			if err != nil {
+				retData["Error"] = err.Error()
+			} else {
+				pag.Offset = uint(page)
+			}
+		}
+		strLimit := r.URL.Query().Get("items")
+		if strLimit == "" {
+			pag.Limit = uint(10)
+		} else {
+			limit, err := strconv.Atoi(strLimit)
+			if err != nil {
+				retData["Error"] = err.Error()
+			} else {
+				pag.Limit = uint(limit)
+			}
+		}
+
+		searchParam := r.URL.Query().Get("partida")
+
+		budgetItems, pagin, err := b.db.GetAllBudgetItems(ctxPayload.CompanyId, pag, searchParam)
 		if err != nil {
-			return
+			retData["Error"] = err.Error()
 		}
 		retData["BudgetItems"] = budgetItems
+		retData["Pagination"] = pagin
+		if searchParam != "" {
+			retData["URL"] = "/bca/parametros/partidas/" + "?partida=" + searchParam + "&"
+		} else {
+			retData["URL"] = "/bca/parametros/partidas/" + "?"
+		}
 
 		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
