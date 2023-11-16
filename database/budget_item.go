@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"strconv"
 
 	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/google/uuid"
@@ -41,21 +40,18 @@ func (d *Database) GetAllBudgetItems(companyId uuid.UUID, pages *types.Paginatio
 	var items []types.BudgetItemType
 	for rows.Next() {
 		var id, parent_id *uuid.UUID
-		var code, name, accumulates, level, parent_code *string
+		var code, name, accumulates, parent_code *string
+		var level *uint
 		if err := rows.Scan(&id, &code, &name, &accumulates, &level, &parent_id, &parent_code); err != nil {
 			return nil, nil, err
 		}
-
-		accBool := *accumulates == "true"
-		levelInt, _ := strconv.Atoi(*level)
-		levelUint := uint(levelInt)
 
 		items = append(items, types.BudgetItemType{
 			ID:          *id,
 			Code:        code,
 			Name:        name,
-			Accumulates: accBool,
-			Level:       &levelUint,
+			Accumulates: *accumulates == "true",
+			Level:       level,
 			ParentId:    parent_id,
 			ParentCode:  parent_code,
 		})
@@ -103,4 +99,25 @@ func (d *Database) CreateBudgetItem(companyId uuid.UUID, budgetItem *types.Budge
 	sql := "INSERT INTO budget_item (company_id, code, name, accumulates, level, parent_id) VALUES ($1, $2, $3, $4, $5, $6)"
 	_, err := d.Exec(sql, companyId, budgetItem.Code, budgetItem.Name, budgetItem.Accumulates, budgetItem.Level, budgetItem.ParentId)
 	return err
+}
+
+func (d *Database) GetBudgetItemById(companyId uuid.UUID, budgetItemId uuid.UUID) (*types.BudgetItemType, error) {
+	sql := "SELECT id, code, name, accumulates, level, parent_id, parent_code FROM budget_item_with_parents WHERE company_id = $1 and id = $2"
+	var id, parent_id *uuid.UUID
+	var level *uint
+	var code, name, parent_code *string
+	var accumulates bool
+	err := d.QueryRow(sql, companyId, budgetItemId).Scan(&id, &code, &name, &accumulates, &level, &parent_id, &parent_code)
+	if err != nil {
+		return nil, err
+	}
+	return &types.BudgetItemType{
+		ID:          *id,
+		Code:        code,
+		Name:        name,
+		Accumulates: accumulates,
+		Level:       level,
+		ParentId:    parent_id,
+		ParentCode:  parent_code,
+	}, nil
 }

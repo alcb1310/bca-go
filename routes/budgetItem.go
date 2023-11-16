@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/alcb1310/bca-go-w-test/database"
 	"github.com/alcb1310/bca-go-w-test/types"
@@ -25,6 +26,47 @@ func (s *settingsRouter) budgetItemsRoutes() {
 
 	b.HandleFunc("/", b.handleBudgetItems)
 	b.HandleFunc("/agregar", b.handleCreateBudgetItem)
+	b.HandleFunc("/{budgetItemId}", b.handleEditBudgetItem)
+}
+
+func (b *budgetItemRouter) handleEditBudgetItem(w http.ResponseWriter, r *http.Request) {
+	ctxPayload, _ := getMyPaload(r)
+	retData := utils.InitializeMap()
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Parámetros"
+	vars := mux.Vars(r)
+	budgetItemId, err := uuid.Parse(vars["budgetItemId"])
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		funcs := map[string]any{
+			"Compare": strings.Compare,
+		}
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/budget-items/create-budget-items.html")
+		tmpl, err := template.New("base").Funcs(funcs).ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+		bi, err := b.db.GetBudgetItemById(ctxPayload.CompanyId, budgetItemId)
+		if err != nil {
+			retData["Error"] = err
+		}
+		retData["BudgetItem"] = bi
+		retData["BudgetItemList"], err = b.db.AllBudgetItemsByAccumulates(ctxPayload.CompanyId, true)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+
+		tmpl.ExecuteTemplate(w, "base", retData)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
 
 func (b *budgetItemRouter) handleBudgetItems(w http.ResponseWriter, r *http.Request) {

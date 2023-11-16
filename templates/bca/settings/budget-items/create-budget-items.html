@@ -1,5 +1,6 @@
 {{ define "Content" }}
 
+{{$bi := .BudgetItem.ParentCode}}
 <section class="m-3">
      <form method="post"
           action="{{ if eq .BudgetItem nil }} /bca/parametros/partidas/ {{else }}/bca/parametros/partidas/{{.BudgetItem.ID}}  {{ end }}">
@@ -42,15 +43,15 @@
                          class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
                </div>
 
-               {{ .BugetItemList }}
                <div class="mt-4">
                     <label for="parent">Padre</label>
                     <select name="parent" id="parent"
                          class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg">
-                         <option value="" {{if or (eq .BudgetItem nil) (eq .BudgetItem.Parent nil)}} selected {{end}}>
-                              Ninguno</option>
+                         <option value="">
+                              Ninguno
+                         </option>
                          {{ range .BudgetItemList}}
-                         <option value="{{.ID}}">
+                         <option value="{{.ID}}" {{ if eq (Compare $bi .Code ) 0}}selected{{end}}>
                               {{.Name}}
                          </option>
                          {{end}}
@@ -58,8 +59,8 @@
                </div>
 
                <div class="mt-4">
-                    <input type="checkbox" id="accumulate" name="accumulate" {{ if eq .Project nil }} checked {{ else }}
-                         {{ if .Project.Accumulate }} checked {{end}}{{ end }}>
+                    <input type="checkbox" id="accumulate" name="accumulate" {{ if .BudgetItem.Accumulates }} checked
+                         {{end}}>
                     <label for="accumulate">Acumula</label>
                </div>
           </div>
