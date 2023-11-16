@@ -183,7 +183,10 @@ func (b *budgetItemRouter) handleCreateBudgetItem(w http.ResponseWriter, r *http
 	switch r.Method {
 	case http.MethodGet:
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/budget-items/create-budget-items.html")
-		tmpl, err := template.ParseFiles(file...)
+		funcs := map[string]any{
+			"Compare": strings.Compare,
+		}
+		tmpl, err := template.New("base").Funcs(funcs).ParseFiles(file...)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return
