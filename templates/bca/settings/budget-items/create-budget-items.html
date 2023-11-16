@@ -1,6 +1,9 @@
 {{ define "Content" }}
 
 {{$bi := .BudgetItem.ParentCode}}
+{{ if not $bi }}
+{{ $bi = "" }}
+{{ end }}
 <section class="m-3">
      <form method="post"
           action="{{ if eq .BudgetItem nil }} /bca/parametros/partidas/ {{else }}/bca/parametros/partidas/{{.BudgetItem.ID}}  {{ end }}">
@@ -51,7 +54,7 @@
                               Ninguno
                          </option>
                          {{ range .BudgetItemList}}
-                         <option value="{{.ID}}" {{ if and $bi (eq Compare $bi .Code 0)}})selected{{end}}>
+                         <option value="{{.ID}}" {{ if eq (Compare $bi .Code ) 0}}selected{{end}}>
                               {{.Name}}
                          </option>
                          {{end}}
