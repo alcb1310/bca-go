@@ -51,7 +51,7 @@
                               Ninguno
                          </option>
                          {{ range .BudgetItemList}}
-                         <option value="{{.ID}}" {{ if and $bi (eq (Compare $bi .Code ) 0}}selected{{end}}>
+                         <option value="{{.ID}}" {{ if and $bi (eq (Compare $bi .Code 0)}}selected{{end}}>
                               {{.Name}}
                          </option>
                          {{end}}
