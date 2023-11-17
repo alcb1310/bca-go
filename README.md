@@ -69,6 +69,9 @@ This option will allow a user to create and update projects, deletion of a proje
 - `Proveedores`
 This option will allow a user to create and update suppliers, deletion of a supplier will not be allowed
 
+- `Partidas`
+This option will allow a user to create and update budgted items, deletion of a budgeted item will not be allowed
+
 ## Deployment
 
 In order to be able to deploy this application, the following is needed:
