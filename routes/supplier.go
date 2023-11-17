@@ -104,7 +104,6 @@ func (s *supplierRouter) handelSingleSupplier(w http.ResponseWriter, r *http.Req
 		http.Redirect(w, r, referer, http.StatusSeeOther)
 	case http.MethodGet:
 		referer := r.Header.Get("Referer")
-		fmt.Println("Referer: ", referer)
 		retData["Referer"] = referer
 		sup, err := s.db.GetSingleSupplier(supplierId, ctxPayload.CompanyId)
 		if err != nil {

@@ -26,10 +26,10 @@ func (s *settingsRouter) budgetItemsRoutes() {
 
 	b.HandleFunc("/", b.handleBudgetItems)
 	b.HandleFunc("/agregar", b.handleCreateBudgetItem)
-	b.HandleFunc("/{budgetItemId}", b.handleEditBudgetItem)
+	b.HandleFunc("/{budgetItemId}", b.handleSingleBudgetItem)
 }
 
-func (b *budgetItemRouter) handleEditBudgetItem(w http.ResponseWriter, r *http.Request) {
+func (b *budgetItemRouter) handleSingleBudgetItem(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
 	retData := utils.InitializeMap()
 	retData["UserName"] = ctxPayload.Name
@@ -84,6 +84,7 @@ func (b *budgetItemRouter) handleEditBudgetItem(w http.ResponseWriter, r *http.R
 			}
 			bi.ParentId = &pId
 		}
+		referer := r.FormValue("referer")
 		accumulates := r.FormValue("accumulate")
 		bi.Accumulates = accumulates == "on"
 		bi.ID = budgetItemId
@@ -94,8 +95,9 @@ func (b *budgetItemRouter) handleEditBudgetItem(w http.ResponseWriter, r *http.R
 		}
 
 		r.Method = http.MethodGet
-		http.Redirect(w, r, "/bca/parametros/partidas/", http.StatusSeeOther)
+		http.Redirect(w, r, referer, http.StatusSeeOther)
 	case http.MethodGet:
+		retData["Referer"] = r.Header.Get("Referer")
 		funcs := map[string]any{
 			"Compare": strings.Compare,
 		}
@@ -171,9 +173,10 @@ func (b *budgetItemRouter) handleBudgetItems(w http.ResponseWriter, r *http.Requ
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		referer := r.FormValue("referer")
 
 		r.Method = http.MethodGet
-		http.Redirect(w, r, "/bca/parametros/partidas/", http.StatusSeeOther)
+		http.Redirect(w, r, referer, http.StatusSeeOther)
 	case http.MethodGet:
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/budget-items/index.html")
 		file = append(file, utils.PaginationTemplate)
@@ -181,6 +184,7 @@ func (b *budgetItemRouter) handleBudgetItems(w http.ResponseWriter, r *http.Requ
 		if err != nil {
 			retData["Error"] = err.Error()
 		}
+		retData["Referer"] = r.Header.Get("Referer")
 
 		pag := &types.PaginationQuery{}
 		strPage := r.URL.Query().Get("pagina")
