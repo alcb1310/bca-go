@@ -121,3 +121,9 @@ func (d *Database) GetBudgetItemById(companyId uuid.UUID, budgetItemId uuid.UUID
 		ParentCode:  parent_code,
 	}, nil
 }
+
+func (d *Database) UpdateBudgetItem(companyId uuid.UUID, budgetItem *types.BudgetItemType) error {
+	sql := "UPDATE budget_item SET code = $1, name = $2, accumulates = $3, level = $4, parent_id = $5 WHERE company_id = $6 AND id = $7"
+	_, err := d.Exec(sql, budgetItem.Code, budgetItem.Name, budgetItem.Accumulates, budgetItem.Level, budgetItem.ParentId, companyId, budgetItem.ID)
+	return err
+}

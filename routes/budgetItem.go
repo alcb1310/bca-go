@@ -42,6 +42,59 @@ func (b *budgetItemRouter) handleEditBudgetItem(w http.ResponseWriter, r *http.R
 	}
 
 	switch r.Method {
+	case http.MethodPost:
+		bi := &types.BudgetItemType{}
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		code := r.FormValue("code")
+		if code == "" {
+			bi.Code = nil
+		} else {
+			bi.Code = &code
+		}
+		name := r.FormValue("name")
+		if name == "" {
+			bi.Name = nil
+		} else {
+			bi.Name = &name
+		}
+		level := r.FormValue("level")
+		if level == "" {
+			bi.Level = nil
+		} else {
+			l, err := strconv.ParseInt(level, 10, 32)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+				return
+			}
+			lNum := uint(l)
+			bi.Level = &lNum
+		}
+		parentId := r.FormValue("parent")
+		if parentId == "" {
+			bi.ParentId = nil
+		} else {
+			pId, err := uuid.Parse(parentId)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+				return
+			}
+			bi.ParentId = &pId
+		}
+		accumulates := r.FormValue("accumulate")
+		bi.Accumulates = accumulates == "on"
+		bi.ID = budgetItemId
+
+		if err := b.db.UpdateBudgetItem(ctxPayload.CompanyId, bi); err != nil {
+			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+			return
+		}
+
+		r.Method = http.MethodGet
+		http.Redirect(w, r, "/bca/parametros/partidas/", http.StatusSeeOther)
 	case http.MethodGet:
 		funcs := map[string]any{
 			"Compare": strings.Compare,
