@@ -81,6 +81,30 @@ create table if not exists budget_item (
      unique(name, company_id)
 );
 
+create table if not exists budget (
+     id uuid PRIMARY KEY default gen_random_uuid(),
+     project_id uuid not null references project(id) on delete restrict,
+     budget_item_id uuid not null references budget_item(id) on delete restrict,
+
+     initial_quantity double precision,
+     initial_cost double precision,
+     initial_total double precision not null,
+
+     spent_quantity double precision,
+     spent_total double precision not null,
+
+     to_spend_quantity double precision,
+     to_spend_cost double precision,
+     to_spend_total double precision not null,
+
+     updated_budget_quantity double precision not null,
+     created_at timestamp with time zone default now(),
+
+     company_id uuid not null references company(id) on delete restrict,
+
+     unique(project_id, budget_item_id, company_id)
+);
+
 --  REQUIRED VIEWS
 
 create or replace view user_without_password as
