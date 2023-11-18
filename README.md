@@ -6,6 +6,7 @@
 - [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 - [https://htmx.org/](https://htmx.org/)
 - [![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)](https://jwt.io)
+- [![built with Codeium](https://codeium.com/badges/main)](https://codeium.com/badges/main)
 
 ## Socials
 
@@ -67,6 +68,9 @@ This option will allow a user to create and update projects, deletion of a proje
 
 - `Proveedores`
 This option will allow a user to create and update suppliers, deletion of a supplier will not be allowed
+
+- `Partidas`
+This option will allow a user to create and update budgted items, deletion of a budgeted item will not be allowed
 
 ## Deployment
 

@@ -161,7 +161,7 @@ func (p *proyectRouter) handleProjects(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/bca/parametros/proyectos/", http.StatusSeeOther)
 	case http.MethodGet:
 		searchParam := r.URL.Query().Get("proyecto")
-		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/projects.html")
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/projects/index.html")
 		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)

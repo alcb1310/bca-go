@@ -66,6 +66,21 @@ create table if not exists supplier (
      unique(supplier_id, company_id)
 );
 
+create table if not exists budget_item (
+     id uuid PRIMARY KEY default gen_random_uuid(),
+     code text not null,
+     name varchar(255) not null,
+     accumulates boolean not null default true,
+     level integer not null,
+     created_at timestamp with time zone default now(),
+
+     parent_id uuid references budget_item(id) on delete restrict,
+     company_id uuid not null references company(id) on delete restrict,
+
+     unique(code, company_id),
+     unique(name, company_id)
+);
+
 --  REQUIRED VIEWS
 
 create or replace view user_without_password as
@@ -74,3 +89,10 @@ u.email user_email, u.name user_name, r.name role_name, r.id role_id
 from "user" u
 inner join role r on u.role_id = r.id
 inner join company c on u.company_id = c.id;
+
+create or replace view budget_item_with_parents as
+select b.id id, b.code code, b.name as name, b.accumulates accumulates, b.level as level, p.code parent_code,
+p.name parent_name, p.id parent_id, b.company_id company_id
+from budget_item b
+left outer join budget_item p on b.parent_id = p.id;
+
