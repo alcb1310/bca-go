@@ -3,8 +3,10 @@ package routes
 import (
 	"html/template"
 	"net/http"
+	"strconv"
 
 	"github.com/alcb1310/bca-go-w-test/database"
+	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
 	"github.com/gorilla/mux"
 )
@@ -26,24 +28,46 @@ func (t *transactionRouter) budgetRoutes() {
 
 func (b *budgetRouter) handleBudget(w http.ResponseWriter, r *http.Request) {
 	ctxPayload, _ := getMyPaload(r)
-	type Ret struct {
-		UserName string
-		Title    string
-		Links    utils.LinksType
-	}
-	retData := Ret{
-		UserName: ctxPayload.Name,
-		Title:    "BCA - Transacciones",
-		Links:    *utils.Links,
-	}
+	retData := utils.InitializeMap()
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Transacciones"
 
 	switch r.Method {
 	case http.MethodGet:
-		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/budget.html")
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/budget/index.html")
 		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return
+		}
+
+		pag := &types.PaginationQuery{}
+		strPage := r.URL.Query().Get("pagina")
+		if strPage == "" {
+			pag.Offset = uint(1)
+		} else {
+			page, err := strconv.Atoi(strPage)
+			if err != nil {
+				retData["Error"] = err.Error()
+			} else {
+				pag.Offset = uint(page)
+			}
+		}
+		strLimit := r.URL.Query().Get("items")
+		if strLimit == "" {
+			pag.Limit = uint(10)
+		} else {
+			limit, err := strconv.Atoi(strLimit)
+			if err != nil {
+				retData["Error"] = err.Error()
+			} else {
+				pag.Limit = uint(limit)
+			}
+		}
+
+		retData["Budgets"], _, err = b.db.GetBudgets(ctxPayload.CompanyId, pag, "")
+		if err != nil {
+			retData["Error"] = err.Error()
 		}
 
 		tmpl.ExecuteTemplate(w, "base", retData)
