@@ -24,6 +24,28 @@ func (t *transactionRouter) budgetRoutes() {
 	}
 
 	b.HandleFunc("/", b.handleBudget)
+	b.HandleFunc("/crear", b.handleCreateBudget)
+}
+
+func (b *budgetRouter) handleCreateBudget(w http.ResponseWriter, r *http.Request) {
+	ctxPayload, _ := getMyPaload(r)
+	retData := utils.InitializeMap()
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Presupuesto"
+
+	switch r.Method {
+	case http.MethodGet:
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/budget/create-budget.html")
+		tmpl, err := template.ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+
+		tmpl.ExecuteTemplate(w, "base", retData)
+	default:
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+	}
 }
 
 func (b *budgetRouter) handleBudget(w http.ResponseWriter, r *http.Request) {
