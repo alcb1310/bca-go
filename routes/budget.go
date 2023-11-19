@@ -42,6 +42,11 @@ func (b *budgetRouter) handleCreateBudget(w http.ResponseWriter, r *http.Request
 			return
 		}
 
+		retData["Projects"], err = b.db.GetActiveProjects(ctxPayload.CompanyId)
+		if err != nil {
+			retData["Error"] = err.Error()
+		}
+
 		tmpl.ExecuteTemplate(w, "base", retData)
 	default:
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
