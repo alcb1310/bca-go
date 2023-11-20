@@ -121,7 +121,7 @@ func (b *budgetRouter) handleBudget(w http.ResponseWriter, r *http.Request) {
 				tmpl.ExecuteTemplate(w, "base", retData)
 				return
 			}
-			budget.ProjectId = &budgetItemUUID
+			budget.BudgetItemId = &budgetItemUUID
 		}
 
 		quantity, err := strconv.ParseFloat(r.FormValue("quantity"), 64)
@@ -142,6 +142,13 @@ func (b *budgetRouter) handleBudget(w http.ResponseWriter, r *http.Request) {
 
 		total := quantity * cost
 		budget.Total = &total
+
+		err = b.db.CreateBudget(budget, ctxPayload.CompanyId)
+		if err != nil {
+			retData["Error"] = err.Error()
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		}
 
 		r.Method = http.MethodGet
 		http.Redirect(w, r, "/bca/transacciones/presupuesto/", http.StatusSeeOther)

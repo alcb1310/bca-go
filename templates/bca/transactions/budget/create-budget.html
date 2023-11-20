@@ -51,14 +51,14 @@
 
                <div class="mt-4">
                     <label for="quantity">Cantidad</label>
-                    <input type="number" name="quantity" id="quantity" placeholder="Cantidad" required
+                    <input name="quantity" id="quantity" placeholder="Cantidad" required
                          value="{{if ne .Budget nil}}{{.Budget.Quantity}}{{end}}"
                          class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
                </div>
 
                <div class="mt-4">
                     <label for="cost">Costo</label>
-                    <input type="number" name="cost" id="cost" placeholder="Costo" required
+                    <input name="cost" id="cost" placeholder="Costo" required
                          value="{{if ne .Budget nil}}{{.Budget.Cost}}{{end}}"
                          class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
                </div>
