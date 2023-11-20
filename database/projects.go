@@ -8,7 +8,7 @@ import (
 )
 
 func (d *Database) GetActiveProjects(company_id uuid.UUID) ([]types.Project, error) {
-	sql := "SELECT id, name, is_active  FROM project WHERE company_id = $1 AND is_active = true"
+	sql := "SELECT id, name, is_active  FROM project WHERE company_id = $1 AND is_active = true order by name"
 	rows, err := d.Query(sql, company_id)
 	if err != nil {
 		return nil, err

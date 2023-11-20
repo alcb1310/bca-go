@@ -22,9 +22,49 @@
 
           <div class="flex flex-col">
                <div>
+                    <label for="project">Proyecto</label>
+                    <select name="project" id="project" required
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg">
+                         <option value="">-- Seleccione --</option>
+                         {{range .Projects}}
+                         <option value="{{.ID}}">
+                              {{.Name}}
+                         </option>
+                         {{end}}
+                    </select>
+               </div>
+
+               <div class="mt-4">
+                    <label for="budgetItem">Partida</label>
+                    <select name="budgetItem" id="budgetItem" required
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg">
+                         <option value="">-- Seleccione --</option>
+                         {{range .BudgetItemList}}
+                         <option value="{{.ID}}">
+                              {{.Code}} - {{.Name}}
+                         </option>
+                         {{end}}
+                    </select>
+               </div>
+
+               <div class="mt-4">
                     <label for="quantity">Cantidad</label>
                     <input type="number" name="quantity" id="quantity" placeholder="Cantidad" required
                          value="{{if ne .Budget nil}}{{.Budget.Quantity}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="cost">Costo</label>
+                    <input type="number" name="cost" id="cost" placeholder="Costo" required
+                         value="{{if ne .Budget nil}}{{.Budget.Cost}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="total">Total</label>
+                    <input type="number" name="total" id="total" placeholder="Total" disabled
+                         value="{{if ne .Budget nil}}{{.Budget.Total}}{{else}}0{{end}}"
                          class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
                </div>
           </div>
