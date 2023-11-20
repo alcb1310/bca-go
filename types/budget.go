@@ -17,3 +17,11 @@ type BudgetType struct {
 	ToSpendTotal    *float64
 	UpddatedBudget  *float64
 }
+
+type BudgetCreate struct {
+	BudgetItemId *uuid.UUID
+	ProjectId    *uuid.UUID
+	Quantity     *float64
+	Cost         *float64
+	Total        *float64
+}

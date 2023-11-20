@@ -8,6 +8,7 @@ import (
 	"github.com/alcb1310/bca-go-w-test/database"
 	"github.com/alcb1310/bca-go-w-test/types"
 	"github.com/alcb1310/bca-go-w-test/utils"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -65,6 +66,85 @@ func (b *budgetRouter) handleBudget(w http.ResponseWriter, r *http.Request) {
 	retData["Title"] = "BCA - Transacciones"
 
 	switch r.Method {
+	case http.MethodPost:
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/budget/create-budget.html")
+		tmpl, err := template.ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+		retData["Projects"], err = b.db.GetActiveProjects(ctxPayload.CompanyId)
+		if err != nil {
+			retData["Error"] = err.Error()
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		}
+
+		retData["BudgetItemList"], err = b.db.AllBudgetItemsByAccumulates(ctxPayload.CompanyId, false)
+		if err != nil {
+			retData["Error"] = err.Error()
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		}
+
+		if err := r.ParseForm(); err != nil {
+			retData["Error"] = err.Error()
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		}
+		budget := &types.BudgetCreate{}
+
+		project := r.FormValue("project")
+		if project == "" {
+			retData["Error"] = "Ingrese un proyecto"
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		} else {
+			projectUUID, err := uuid.Parse(project)
+			if err != nil {
+				retData["Error"] = err.Error()
+				tmpl.ExecuteTemplate(w, "base", retData)
+				return
+			}
+			budget.ProjectId = &projectUUID
+		}
+
+		budgetItem := r.FormValue("budgetItem")
+		if budgetItem == "" {
+			retData["Error"] = "Ingrese una partida"
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		} else {
+			budgetItemUUID, err := uuid.Parse(budgetItem)
+			if err != nil {
+				retData["Error"] = err.Error()
+				tmpl.ExecuteTemplate(w, "base", retData)
+				return
+			}
+			budget.ProjectId = &budgetItemUUID
+		}
+
+		quantity, err := strconv.ParseFloat(r.FormValue("quantity"), 64)
+		if err != nil {
+			retData["Error"] = err.Error()
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		}
+		budget.Quantity = &quantity
+
+		cost, err := strconv.ParseFloat(r.FormValue("cost"), 64)
+		if err != nil {
+			retData["Error"] = err.Error()
+			tmpl.ExecuteTemplate(w, "base", retData)
+			return
+		}
+		budget.Cost = &cost
+
+		total := quantity * cost
+		budget.Total = &total
+
+		r.Method = http.MethodGet
+		http.Redirect(w, r, "/bca/transacciones/presupuesto/", http.StatusSeeOther)
 	case http.MethodGet:
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/budget/index.html")
 		tmpl, err := template.ParseFiles(file...)
