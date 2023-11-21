@@ -153,8 +153,11 @@ func (b *budgetRouter) handleBudget(w http.ResponseWriter, r *http.Request) {
 		r.Method = http.MethodGet
 		http.Redirect(w, r, "/bca/transacciones/presupuesto/", http.StatusSeeOther)
 	case http.MethodGet:
+		funcMap := template.FuncMap{
+			"FormatNumber": utils.FormatNumber,
+		}
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/budget/index.html")
-		tmpl, err := template.ParseFiles(file...)
+		tmpl, err := template.New("base").Funcs(funcMap).ParseFiles(file...)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return

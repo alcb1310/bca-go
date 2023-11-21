@@ -11,6 +11,7 @@ import (
 func (d *Database) GetBudgets(companyId uuid.UUID, pages *types.PaginationQuery, searchParam string) ([]types.BudgetType, *types.PaginationReturn, error) {
 	var ret []types.BudgetType
 	sqlQuery := "SELECT id, project, code, budget_item_name, initial_quantity, initial_cost, initial_total, spent_quantity, spent_total, to_spend_quantity, to_spend_cost, to_spend_total, updated_budget FROM budget_description WHERE company_id = $1"
+	sqlQuery += " ORDER BY project, code"
 
 	rows, err := d.Query(sqlQuery, companyId)
 	if err != nil {

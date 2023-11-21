@@ -38,6 +38,22 @@
                <tr>
                     <td colspan="7" class="text-center">No existen presupuestos</td>
                </tr>
+               {{ else }}
+               {{ range .Budgets }}
+               <tr class="hover:bg-gray-100">
+                    <td>{{ .ProjectName }}</td>
+                    <td>{{ .BudgetItemCode }}</td>
+                    <td>{{ .BudgetItemName }}</td>
+                    <td align="right">{{if .ToSpendQuantity}}{{ .ToSpendQuantity | FormatNumber }}{{end}}</td>
+                    <td align="right">{{if .ToSpendCost}}{{ .ToSpendCost | FormatNumber }}{{end}}</td>
+                    <td align="right">{{ .ToSpendTotal | FormatNumber }}</td>
+                    <td align="center">
+                         <a href="/bca/transacciones/presupuesto/{{.ID}}">
+                              <img src="/css/images/edit-outline.svg" alt="edit button" width="15px" />
+                         </a>
+                    </td>
+               </tr>
+               {{ end }}
                {{ end }}
           </tbody>
 
