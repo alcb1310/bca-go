@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/alcb1310/bca-go-w-test/database"
 	"github.com/alcb1310/bca-go-w-test/types"
@@ -26,6 +27,53 @@ func (t *transactionRouter) budgetRoutes() {
 
 	b.HandleFunc("/", b.handleBudget)
 	b.HandleFunc("/crear", b.handleCreateBudget)
+	b.HandleFunc("/{budgetId}", b.handleEditBudget)
+}
+
+func (b *budgetRouter) handleEditBudget(w http.ResponseWriter, r *http.Request) {
+	ctxPayload, _ := getMyPaload(r)
+	retData := utils.InitializeMap()
+	retData["UserName"] = ctxPayload.Name
+	retData["Title"] = "BCA - Presupuesto"
+
+	bI := mux.Vars(r)["budgetId"]
+	budgetId, err := uuid.Parse(bI)
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		funcs := map[string]any{
+			"Compare": strings.Compare,
+		}
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/budget/create-budget.html")
+		tmpl, err := template.New("base").Funcs(funcs).ParseFiles(file...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusTeapot)
+			return
+		}
+
+		retData["Projects"], err = b.db.GetActiveProjects(ctxPayload.CompanyId)
+		if err != nil {
+			retData["Error"] = err.Error()
+		}
+
+		retData["BudgetItemList"], err = b.db.AllBudgetItemsByAccumulates(ctxPayload.CompanyId, false)
+		if err != nil {
+			retData["Error"] = err.Error()
+		}
+
+		retData["Budget"], err = b.db.GetBudgetById(budgetId, ctxPayload.CompanyId)
+		if err != nil {
+			retData["Error"] = err.Error()
+		}
+
+		tmpl.ExecuteTemplate(w, "base", retData)
+	default:
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+	}
 }
 
 func (b *budgetRouter) handleCreateBudget(w http.ResponseWriter, r *http.Request) {
@@ -36,8 +84,11 @@ func (b *budgetRouter) handleCreateBudget(w http.ResponseWriter, r *http.Request
 
 	switch r.Method {
 	case http.MethodGet:
+		funcsMap := map[string]any{
+			"Compare": strings.Compare,
+		}
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/budget/create-budget.html")
-		tmpl, err := template.ParseFiles(file...)
+		tmpl, err := template.New("base").Funcs(funcsMap).ParseFiles(file...)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
 			return

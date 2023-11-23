@@ -19,6 +19,7 @@ type BudgetType struct {
 }
 
 type BudgetCreate struct {
+	ID           *uuid.UUID
 	BudgetItemId *uuid.UUID
 	ProjectId    *uuid.UUID
 	Quantity     *float64

@@ -1,5 +1,15 @@
 {{ define "Content" }}
 
+
+{{ $bi := .Budget.BudgetItemId }}
+{{ if not $bi }}
+{{ $bi = "" }}
+{{ end }}
+
+{{ $p := .Budget.ProjectId }}
+{{ if not $p }}
+{{ $p = "" }}
+{{ end }}
 <section class="m-3">
      <form method="post"
           action="{{ if eq .Budget nil }} /bca/transacciones/presupuesto/ {{else}}/bca/transacciones/presupuesto/{{.Budget.ID}} {{ end }}">
@@ -29,6 +39,8 @@
                          class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg">
                          <option value="">-- Seleccione --</option>
                          {{range .Projects}}
+                         {{ .ID }}
+                         {{ $p }}
                          <option value="{{.ID}}">
                               {{.Name}}
                          </option>

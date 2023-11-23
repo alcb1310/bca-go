@@ -128,3 +128,15 @@ func (d *Database) SaveBudget(budget *types.BudgetCreate, budgetItem *uuid.UUID,
 
 	return d.SaveBudget(budget, bi.ParentId, companyId)
 }
+
+func (d *Database) GetBudgetById(budgetId uuid.UUID, companyId uuid.UUID) (*types.BudgetCreate, error) {
+	sqlQuery := "SELECT id, project_id, budget_item_id,  to_spend_quantity, to_spend_cost, to_spend_total  FROM budget WHERE company_id = $1 AND id = $2"
+	row := d.QueryRow(sqlQuery, companyId, budgetId)
+	b := &types.BudgetCreate{}
+	err := row.Scan(&b.ID, &b.ProjectId, &b.BudgetItemId, &b.Quantity, &b.Cost, &b.Total)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
+}
