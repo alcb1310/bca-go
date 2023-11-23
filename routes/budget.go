@@ -157,6 +157,7 @@ func (b *budgetRouter) handleBudget(w http.ResponseWriter, r *http.Request) {
 			"FormatNumber": utils.FormatNumber,
 		}
 		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/transactions/budget/index.html")
+		file = append(file, utils.PaginationTemplate)
 		tmpl, err := template.New("base").Funcs(funcMap).ParseFiles(file...)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusTeapot)
@@ -186,10 +187,16 @@ func (b *budgetRouter) handleBudget(w http.ResponseWriter, r *http.Request) {
 				pag.Limit = uint(limit)
 			}
 		}
+		searchParam := r.URL.Query().Get("presupuesto")
 
-		retData["Budgets"], _, err = b.db.GetBudgets(ctxPayload.CompanyId, pag, "")
+		retData["Budgets"], retData["Pagination"], err = b.db.GetBudgets(ctxPayload.CompanyId, pag, "")
 		if err != nil {
 			retData["Error"] = err.Error()
+		}
+		if searchParam != "" {
+			retData["URL"] = "/bca/transacciones/presupuesto/" + "?presupuesto=" + searchParam + "&"
+		} else {
+			retData["URL"] = "/bca/transacciones/presupuesto/" + "?"
 		}
 
 		tmpl.ExecuteTemplate(w, "base", retData)

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -10,10 +11,32 @@ import (
 
 func (d *Database) GetBudgets(companyId uuid.UUID, pages *types.PaginationQuery, searchParam string) ([]types.BudgetType, *types.PaginationReturn, error) {
 	var ret []types.BudgetType
+	var rows *sql.Rows
+	var err error
 	sqlQuery := "SELECT id, project, code, budget_item_name, initial_quantity, initial_cost, initial_total, spent_quantity, spent_total, to_spend_quantity, to_spend_cost, to_spend_total, updated_budget FROM budget_description WHERE company_id = $1"
-	sqlQuery += " ORDER BY project, code"
 
-	rows, err := d.Query(sqlQuery, companyId)
+	if searchParam != "" {
+		sqlQuery += " AND budget_item_name ILIKE $2"
+		sqlQuery += " ORDER BY project, code"
+
+		if pages != nil && pages.Limit != 0 {
+			sqlQuery += " OFFSET $4"
+			sqlQuery += " LIMIT $3"
+			rows, err = d.Query(sqlQuery, companyId, "%"+searchParam+"%", pages.Limit, pages.Offset)
+		} else {
+			rows, err = d.Query(sqlQuery, companyId, "%"+searchParam+"%")
+		}
+	} else {
+		sqlQuery += " ORDER BY project, code"
+		if pages != nil && pages.Limit != 0 {
+			sqlQuery += " OFFSET $3"
+			sqlQuery += " LIMIT $2"
+			rows, err = d.Query(sqlQuery, companyId, pages.Limit, pages.Offset)
+		} else {
+			rows, err = d.Query(sqlQuery, companyId)
+		}
+	}
+
 	if err != nil {
 		return nil, nil, err
 	}
