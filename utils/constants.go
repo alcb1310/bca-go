@@ -23,7 +23,7 @@ var Links = &LinksType{
 	Actual:     HTML_PATH_PREFIX + "/reportes/actual",
 	Historic:   HTML_PATH_PREFIX + "/reportes/historico",
 	Supplier:   HTML_PATH_PREFIX + "/parametros/proveedor/",
-	BudgetItem: HTML_PATH_PREFIX + "/parametros/partidas",
+	BudgetItem: HTML_PATH_PREFIX + "/parametros/partidas/",
 	Projects:   HTML_PATH_PREFIX + "/parametros/proyectos/",
 	EditUser:   HTML_PATH_PREFIX + "/usuarios/",
 	Password:   HTML_PATH_PREFIX + "/usuarios/contrasena",

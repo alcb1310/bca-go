@@ -104,7 +104,6 @@ func (s *supplierRouter) handelSingleSupplier(w http.ResponseWriter, r *http.Req
 		http.Redirect(w, r, referer, http.StatusSeeOther)
 	case http.MethodGet:
 		referer := r.Header.Get("Referer")
-		fmt.Println("Referer: ", referer)
 		retData["Referer"] = referer
 		sup, err := s.db.GetSingleSupplier(supplierId, ctxPayload.CompanyId)
 		if err != nil {
@@ -206,7 +205,7 @@ func (s *supplierRouter) handleSuppliers(w http.ResponseWriter, r *http.Request)
 		r.Method = http.MethodGet
 		http.Redirect(w, r, referer, http.StatusSeeOther)
 	case http.MethodGet:
-		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/suppliers/suppliers.html")
+		file := append(utils.RequiredFiles, utils.TEMPLATE_DIR+"bca/settings/suppliers/index.html")
 		file = append(file, utils.PaginationTemplate)
 		tmpl, err := template.ParseFiles(file...)
 		if err != nil {
