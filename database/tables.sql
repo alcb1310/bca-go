@@ -81,6 +81,30 @@ create table if not exists budget_item (
      unique(name, company_id)
 );
 
+create table if not exists budget (
+     id uuid PRIMARY KEY default gen_random_uuid(),
+     project_id uuid not null references project(id) on delete restrict,
+     budget_item_id uuid not null references budget_item(id) on delete restrict,
+
+     initial_quantity double precision,
+     initial_cost double precision,
+     initial_total double precision not null,
+
+     spent_quantity double precision,
+     spent_total double precision not null,
+
+     to_spend_quantity double precision,
+     to_spend_cost double precision,
+     to_spend_total double precision not null,
+
+     updated_budget double precision not null,
+     created_at timestamp with time zone default now(),
+
+     company_id uuid not null references company(id) on delete restrict,
+
+     unique(project_id, budget_item_id, company_id)
+);
+
 --  REQUIRED VIEWS
 
 create or replace view user_without_password as
@@ -96,3 +120,10 @@ p.name parent_name, p.id parent_id, b.company_id company_id
 from budget_item b
 left outer join budget_item p on b.parent_id = p.id;
 
+create or replace view budget_description as 
+select b.id as id, p.name project, bi.code code, bi.name budget_item_name,
+b.initial_quantity, b.initial_cost, b.initial_total, b.spent_quantity, b.spent_total,
+b.to_spend_quantity, b.to_spend_cost, b.to_spend_total, b.updated_budget, b.company_id
+from budget b
+inner join budget_item bi on bi.id = b.budget_item_id
+inner join project p on p.id = b.project_id;

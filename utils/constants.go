@@ -17,7 +17,7 @@ type LinksType struct {
 }
 
 var Links = &LinksType{
-	Budget:     HTML_PATH_PREFIX + "/transacciones/presupuesto",
+	Budget:     HTML_PATH_PREFIX + "/transacciones/presupuesto/",
 	Invoices:   HTML_PATH_PREFIX + "/transacciones/factura",
 	Closure:    HTML_PATH_PREFIX + "/transacciones/cierre",
 	Actual:     HTML_PATH_PREFIX + "/reportes/actual",

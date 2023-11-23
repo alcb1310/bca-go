@@ -1,0 +1,113 @@
+{{ define "Content" }}
+
+
+{{ $bi := .Budget.BudgetItemId }}
+{{ if not $bi }}
+{{ $bi = "" }}
+{{ end }}
+
+{{ $p := .Budget.ProjectId }}
+{{ if not $p }}
+{{ $p = "" }}
+{{ end }}
+<section class="m-3">
+     <form method="post"
+          action="{{ if eq .Budget nil }} /bca/transacciones/presupuesto/ {{else}}/bca/transacciones/presupuesto/{{.Budget.ID}} {{ end }}">
+          <div class="flex justify-between items-center">
+               <h3 class="text-lg font-semibold">
+                    {{ if eq .Budget nil }}
+                    Crear
+                    {{ else }}
+                    Editar
+                    {{ end }}
+                    Presupuesto
+               </h3>
+               <div>
+                    <button type="submit"
+                         class="mt-2 bg-blue-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-blue-400">Grabar</button>
+                    <a href="/bca/transacciones/presupuesto/"
+                         class="mt-2 bg-red-700 text-gray-50 w-fit px-4 py-2 rounded-full text-center algn-self-end hover:bg-red-400">Cancelar</a>
+               </div>
+          </div>
+
+          <p class="text-sm text-red-700 mb-4"> {{ .Error }} </p>
+
+          <div class="flex flex-col">
+               <div>
+                    <label for="project">Proyecto</label>
+                    <select name="project" id="project"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg">
+                         <option value="">-- Seleccione --</option>
+                         {{range .Projects}}
+                         {{ .ID }}
+                         {{ $p }}
+                         <option value="{{.ID}}">
+                              {{.Name}}
+                         </option>
+                         {{end}}
+                    </select>
+               </div>
+
+               <div class="mt-4">
+                    <label for="budgetItem">Partida</label>
+                    <select name="budgetItem" id="budgetItem" required
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg">
+                         <option value="">-- Seleccione --</option>
+                         {{range .BudgetItemList}}
+                         <option value="{{.ID}}">
+                              {{.Code}} - {{.Name}}
+                         </option>
+                         {{end}}
+                    </select>
+               </div>
+
+               <div class="mt-4">
+                    <label for="quantity">Cantidad</label>
+                    <input name="quantity" id="quantity" placeholder="Cantidad" required
+                         value="{{if ne .Budget nil}}{{.Budget.Quantity}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="cost">Costo</label>
+                    <input name="cost" id="cost" placeholder="Costo" required
+                         value="{{if ne .Budget nil}}{{.Budget.Cost}}{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+               </div>
+
+               <div class="mt-4">
+                    <label for="total">Total</label>
+                    <input type="number" name="total" id="total" placeholder="Total" disabled
+                         value="{{if ne .Budget nil}}{{.Budget.Total}}{{else}}0{{end}}"
+                         class="border border-slate-600 w-1/2 px-2 py-1 focus:border-slate-300 rounded-lg" />
+               </div>
+          </div>
+     </form>
+</section>
+
+{{ end }}
+
+{{ define "Scripts" }}
+
+<script>
+     const quantity = document.getElementById("quantity");
+     const cost = document.getElementById("cost");
+     const total = document.getElementById("total");
+
+     cost.addEventListener("input", calculateTotal);
+     quantity.addEventListener("input", calculateTotal);
+
+     function calculateTotal() {
+          const cantidad = quantity.value;
+          const costo = cost.value;
+
+          if (isNaN(cantidad) || isNaN(costo) || cantidad == "" || costo == "") {
+               total.value = 0
+               return
+          }
+
+          total.value = (cantidad * costo).toFixed(2)
+     }
+</script>
+
+{{ end }}
