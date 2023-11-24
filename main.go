@@ -21,11 +21,10 @@ func main() {
 		}
 	}
 	c := cors.New(cors.Options{
-		// AllowedOrigins:   []string{"http://localhost:5173"},
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 	})
-	// h := routes.NewRouter()
+
 	h := api.NewRouter()
 	handler := c.Handler(h)
 
