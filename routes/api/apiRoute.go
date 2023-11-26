@@ -32,6 +32,7 @@ func NewRouter() *router {
 
 func (s *router) routes() {
 	s.HandleFunc("/", s.mainRoute).Methods(http.MethodGet)
+	s.HandleFunc("/login", s.handleLogin).Methods(http.MethodPost)
 }
 
 func (s *router) mainRoute(w http.ResponseWriter, r *http.Request) {
@@ -46,4 +47,39 @@ func (s *router) mainRoute(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(msgJson)
+}
+
+func (s *router) handleLogin(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		type loginPayload struct {
+			Email    string `json:"email"`
+			Password string `json:"password"`
+		}
+		var lp loginPayload
+		err := json.NewDecoder(r.Body).Decode(&lp)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if lp.Email == "" || lp.Password == "" {
+			http.Error(w, "Incomplete information", http.StatusBadRequest)
+			return
+		}
+
+		token, err := s.db.Login(lp.Email, lp.Password)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		msg := map[string]string{
+			"token": token,
+		}
+
+		msgJson, _ := json.Marshal(msg)
+		w.Write(msgJson)
+		return
+	}
 }
