@@ -63,13 +63,21 @@ func (s *router) handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if lp.Email == "" || lp.Password == "" {
-			http.Error(w, "Incomplete information", http.StatusBadRequest)
+			msg := map[string]string{
+				"message": "Información Incompleta",
+			}
+			msgJson, _ := json.Marshal(msg)
+			http.Error(w, string(msgJson), http.StatusBadRequest)
 			return
 		}
 
 		token, err := s.db.Login(lp.Email, lp.Password)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			msg := map[string]string{
+				"message": err.Error(),
+			}
+			msgJson, _ := json.Marshal(msg)
+			http.Error(w, string(msgJson), http.StatusUnauthorized)
 			return
 		}
 

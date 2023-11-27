@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/alcb1310/bca-go-w-test/routes/api"
+	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
-	"github.com/rs/cors"
 )
 
 func main() {
@@ -20,15 +20,13 @@ func main() {
 			log.Panic("Unable to load environment variables")
 		}
 	}
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowCredentials: true,
-	})
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
+	originsOk := handlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
 
 	h := api.NewRouter()
-	handler := c.Handler(h)
 
 	fileServer := http.FileServer(http.Dir("./dist/"))
 	h.PathPrefix("/css/").Handler(http.StripPrefix("/css/", fileServer))
-	log.Panic(http.ListenAndServe(fmt.Sprintf(":%s", port), handler))
+	log.Panic(http.ListenAndServe(fmt.Sprintf(":%s", port), handlers.CORS(originsOk, headersOk, methodsOk)(h)))
 }
